@@ -4,15 +4,22 @@ import mongoose from 'mongoose';
 dotenv.config();
 
 class Database {
-  static start() {
-    mongoose
-    .connect(process.env.DB_URL, {
+  static async start(mode) {
+    let dbUrl;
+
+    if (mode === 'test') dbUrl = process.env.TEST_DB_URL;
+    else dbUrl = process.env.DB_URL;
+
+    try {
+      await mongoose.connect(dbUrl, {
         useNewUrlParser: true,
         useCreateIndex: true,
-        useFindAndModify: false
-    })
-    .then(() => console.log('Connected to Task Manager DB'))
-    .catch((err) => console.log(err));
+        useFindAndModify: false,
+      });
+      console.log(`Database connected to Task Manager DB, mode: ${mode}`);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   static createModel(name, model) {
