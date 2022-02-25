@@ -1,0 +1,18 @@
+name: Open PR to Staging Branch on push
+on:
+  push:
+    branches:
+      - 'feat/*'
+      - 'fix/*'
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: pull-request
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: 'staging'
+          pr_title: 'Pulling ${{ github.ref }} into staging'
+          pr_body: 'Pulling ${{ github.ref }} into staging -- ${{ github.actor }}'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
