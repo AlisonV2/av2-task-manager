@@ -9,12 +9,14 @@ class TaskService {
       status: task.status,
     };
   }
-  static async createTask(task) {
+  static async createTask(user, task) {
     try {
+      const userId = user.id;
       const newTask = new Task({
         title: task.title,
         description: task.description,
         status: task.status,
+        user: userId,
       });
 
       return await newTask.save();
@@ -26,6 +28,7 @@ class TaskService {
   }
 
   static async updateTask(id, task) {
+    // update to include user
     try {
       const updatedTask = await Task.findByIdAndUpdate(
         id,
@@ -52,6 +55,7 @@ class TaskService {
   }
 
   static async getTaskById(id) {
+    // update to include user
     try {
       const task = await Task.findOne({ _id: id });
       if (!task) {
@@ -69,6 +73,7 @@ class TaskService {
   }
 
   static async deleteTask(id) {
+    // update to include user
     try {
       const deletedTask = await Task.findOneAndDelete({ _id: id });
       if (!deletedTask) {
@@ -86,6 +91,7 @@ class TaskService {
   }
 
   static async getTasks() {
+    // update to include user
     try {
       let formattedTasks = [];
       const tasks = await Task.find();

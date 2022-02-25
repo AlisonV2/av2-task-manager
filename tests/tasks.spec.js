@@ -13,7 +13,12 @@ describe('Task Model', () => {
       description: 'Test description',
     };
 
-    const createdTask = await TaskService.createTask(task);
+    const user = {
+      id: '5f0b8b9f9d7d3b3d3c7f2f0f',
+      role: 'user'
+    };
+
+    const createdTask = await TaskService.createTask(user, task);
 
     expect(createdTask.title).toBe(task.title);
     expect(createdTask.description).toBe(task.description);

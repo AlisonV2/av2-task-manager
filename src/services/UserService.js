@@ -3,6 +3,7 @@ import SecurityService from './SecurityService';
 
 class UserService {
   static async createUser(user) {
+    // send mail to validate user
     try {
       const hashed = await SecurityService.hashPassword(user.password);
       const newUser = new User({

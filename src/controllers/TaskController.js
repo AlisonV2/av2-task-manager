@@ -3,7 +3,7 @@ import TaskService from '../services/TaskService';
 class TaskController {
   static async createTask(req, res) {
     try {
-      const newTask = await TaskService.createTask(req.body);
+      const newTask = await TaskService.createTask(req.user, req.body);
       res
         .status(201)
         .json({ message: 'Task created successfully', task_id: newTask._id });
