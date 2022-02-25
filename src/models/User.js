@@ -19,6 +19,15 @@ const User = Database.createModel('User', {
     minlength: 7,
     trim: true,
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
+  token: {
+    type: String,
+    default: null,
+  },
 });
 
 export default User;
