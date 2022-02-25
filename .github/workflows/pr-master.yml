@@ -1,0 +1,17 @@
+name: Open PR to Master Branch on push
+on:
+  push:
+    branches:
+      - 'staging'
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: pull-request
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: 'main'
+          pr_title: 'Pulling ${{ github.ref }} into master'
+          pr_body: 'Pulling ${{ github.ref }} into master -- ${{ github.actor }}'
+          github_token: ${{ secrets.GITHUB_TOKEN }}

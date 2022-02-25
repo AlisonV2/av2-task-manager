@@ -27,6 +27,11 @@
     "supertest": "^6.2.1"
   },
   "dependencies": {
-    "swagger-ui-express": "^4.3.0"
+    "mongodb-memory-server": "^8.4.0",
+    "mongoose": "^5.3.16",
+    "morgan": "^1.10.0",
+    "swagger-jsdoc": "^6.1.0",
+    "swagger-ui-express": "^4.3.0",
+    "validator": "^13.7.0"
   }
 }
