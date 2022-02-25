@@ -17,11 +17,10 @@ class TaskService {
         status: task.status,
       });
 
-      const createdTask = await newTask.save();
-      return createdTask._id;
+      return await newTask.save();
     } catch (err) {
       const error = new Error('Error creating task');
-      error.statusCode = 500;
+      error.statusCode = 400;
       throw error;
     }
   }
@@ -46,8 +45,8 @@ class TaskService {
 
       return this.formatTask(task);
     } catch (err) {
-      const error = new Error('Error updating task');
-      error.statusCode = 500;
+      const error = new Error(err.message);
+      error.statusCode = err.statusCode;
       throw error;
     }
   }
@@ -63,8 +62,8 @@ class TaskService {
 
       return this.formatTask(task);
     } catch (err) {
-      const error = new Error('Error getting task');
-      error.statusCode = 500;
+      const error = new Error(err.message);
+      error.statusCode = err.statusCode;
       throw error;
     }
   }
@@ -80,8 +79,8 @@ class TaskService {
 
       return this.formatTask(deletedTask);
     } catch (err) {
-      const error = new Error('Error deleting task');
-      error.statusCode = 500;
+      const error = new Error(err.message);
+      error.statusCode = err.statusCode;
       throw error;
     }
   }
@@ -90,13 +89,20 @@ class TaskService {
     try {
       let formattedTasks = [];
       const tasks = await Task.find();
+
+      if (!tasks.length) {
+        const error = new Error('No tasks found');
+        error.statusCode = 404;
+        throw error;
+      }
+
       for (let i in tasks) {
         formattedTasks.push(this.formatTask(tasks[i]));
       }
       return formattedTasks;
     } catch (err) {
-      const error = new Error('Error getting tasks');
-      error.statusCode = 500;
+      const error = new Error(err.message);
+      error.statusCode = err.statusCode;
       throw error;
     }
   }

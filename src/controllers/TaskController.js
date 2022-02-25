@@ -2,13 +2,11 @@ import TaskService from '../services/TaskService';
 
 class TaskController {
   static async createTask(req, res) {
-    console.log(req.body)
     try {
-      const task_id = await TaskService.createTask(req.body);
-      console.log(task_id)
+      const newTask = await TaskService.createTask(req.body);
       res
         .status(201)
-        .json({ message: 'Task created successfully', task_id: task_id });
+        .json({ message: 'Task created successfully', task_id: newTask._id });
     } catch (err) {
       res.status(500).json(err);
     }
