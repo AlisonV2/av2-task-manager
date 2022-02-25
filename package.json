@@ -1,0 +1,32 @@
+{
+  "name": "av2-task-manager",
+  "version": "1.0.0",
+  "description": "Web services: Bordeaux Ynov M1 Majeure - Final",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "babel-node": "babel-node src/index.js",
+    "dev": "nodemon --exec npm run babel-node",
+    "build": "babel src --out-dir dist"
+  },
+  "author": "Alison Vandromme",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.16.8",
+    "@babel/core": "^7.16.7",
+    "@babel/node": "^7.16.8",
+    "@babel/preset-env": "^7.16.8",
+    "babel-jest": "^27.4.6",
+    "check-code-coverage": "^1.10.0",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^14.2.0",
+    "express": "^4.17.2",
+    "jest": "^27.4.7",
+    "nodemon": "^2.0.15",
+    "supertest": "^6.2.1"
+  },
+  "dependencies": {
+    "swagger-ui-express": "^4.3.0"
+  }
+}
