@@ -11,12 +11,11 @@ class TaskService {
   }
   static async createTask(user, task) {
     try {
-      const userId = user.id;
       const newTask = new Task({
         title: task.title,
         description: task.description,
         status: task.status,
-        user: userId,
+        user: user.id,
       });
 
       return await newTask.save();
@@ -27,18 +26,9 @@ class TaskService {
     }
   }
 
-  static async updateTask(id, task) {
-    // update to include user
+  static async updateTask(user, id, task) {
     try {
-      const updatedTask = await Task.findByIdAndUpdate(
-        id,
-        {
-          title: task.title,
-          description: task.description,
-          status: task.status,
-        },
-        { useFindAndModify: false, new: false }
-      );
+      const updatedTask = await Task.findOne({ _id: id, user: user.id });
 
       if (!updatedTask) {
         const error = new Error('Task not found');
@@ -46,7 +36,13 @@ class TaskService {
         throw error;
       }
 
-      return this.formatTask(task);
+      updatedTask.title = task.title;
+      updatedTask.description = task.description;
+      updatedTask.status = task.status;
+
+      const savedTask = await updatedTask.save();
+
+      return this.formatTask(savedTask);
     } catch (err) {
       const error = new Error(err.message);
       error.statusCode = err.statusCode;
@@ -54,10 +50,10 @@ class TaskService {
     }
   }
 
-  static async getTaskById(id) {
-    // update to include user
+  static async getTaskById(user, id) {
     try {
-      const task = await Task.findOne({ _id: id });
+      const task = await Task.findOne({ _id: id, user: user.id });
+
       if (!task) {
         const error = new Error('Task not found');
         error.statusCode = 404;
@@ -72,17 +68,17 @@ class TaskService {
     }
   }
 
-  static async deleteTask(id) {
-    // update to include user
+  static async deleteTask(user, id) {
     try {
-      const deletedTask = await Task.findOneAndDelete({ _id: id });
-      if (!deletedTask) {
+      const task = await Task.findOneAndDelete({ _id: id, user: user.id });
+
+      if (!task) {
         const error = new Error('Task not found');
         error.statusCode = 404;
         throw error;
       }
-
-      return this.formatTask(deletedTask);
+ 
+      return 'Task deleted successfully';
     } catch (err) {
       const error = new Error(err.message);
       error.statusCode = err.statusCode;
@@ -90,11 +86,10 @@ class TaskService {
     }
   }
 
-  static async getTasks() {
-    // update to include user
+  static async getTasks(user) {
     try {
       let formattedTasks = [];
-      const tasks = await Task.find();
+      const tasks = await Task.find({ user: user.id});
 
       if (!tasks.length) {
         const error = new Error('No tasks found');

@@ -3,19 +3,18 @@ import TaskService from '../src/services/TaskService';
 import { createTask } from './fixtures/tasks';
 
 beforeEach(async () => connect());
-
 afterEach(async () => disconnect());
+
+const user = {
+  id: '5f0b8b9f9d7d3b3d3c7f2f0f',
+  role: 'user'
+};
 
 describe('Task Model', () => {
   test('Should create a new Task', async () => {
     const task = {
       title: 'Test task',
       description: 'Test description',
-    };
-
-    const user = {
-      id: '5f0b8b9f9d7d3b3d3c7f2f0f',
-      role: 'user'
     };
 
     const createdTask = await TaskService.createTask(user, task);
@@ -28,7 +27,7 @@ describe('Task Model', () => {
   test('Should update task', async () => {
     const createdTask = await createTask();
 
-    const updatedTask = await TaskService.updateTask(createdTask._id, {
+    const updatedTask = await TaskService.updateTask(user, createdTask._id, {
       title: 'Updated Task',
       description: 'Updated Task Description',
       status: 'completed',
@@ -41,7 +40,7 @@ describe('Task Model', () => {
 
   test('Should get task by id', async () => {
     const createdTask = await createTask();
-    const foundTask = await TaskService.getTaskById(createdTask._id);
+    const foundTask = await TaskService.getTaskById(user, createdTask._id);
 
     expect(foundTask.title).toBe(createdTask.title);
     expect(foundTask.description).toBe(createdTask.description);
@@ -50,11 +49,9 @@ describe('Task Model', () => {
 
   test('Should delete task', async () => {
     const createdTask = await createTask();
-    const deletedTask = await TaskService.deleteTask(createdTask._id);
+    const deletedTask = await TaskService.deleteTask(user, createdTask._id);
 
-    expect(deletedTask.title).toBe(createdTask.title);
-    expect(deletedTask.description).toBe(createdTask.description);
-    expect(deletedTask.status).toBe('pending');
+    expect(deletedTask).toBe('Task deleted successfully');
   });
 
   test('Should return properly formatted task', async () => {
@@ -66,7 +63,7 @@ describe('Task Model', () => {
 
   test('Should get all tasks', async () => {
     const createdTask = await createTask();
-    const foundTasks = await TaskService.getTasks();
+    const foundTasks = await TaskService.getTasks(user);
 
     expect(foundTasks.length).toBe(1);
     expect(foundTasks[0].title).toBe(createdTask.title);
@@ -82,7 +79,7 @@ describe('Task Model', () => {
     };
 
     try {
-      await TaskService.updateTask(id, task);
+      await TaskService.updateTask(user, id, task);
     } catch (err) {
       expect(err.message).toBe('Task not found');
       expect(err.statusCode).toBe(404);
@@ -93,7 +90,7 @@ describe('Task Model', () => {
     const id = '5f0b8b9f9d7d3b3d3c7f2f0f';
 
     try {
-      await TaskService.getTaskById(id);
+      await TaskService.getTaskById(user, id);
     } catch (err) {
       expect(err.message).toBe('Task not found');
       expect(err.statusCode).toBe(404);
@@ -104,7 +101,7 @@ describe('Task Model', () => {
     const id = '5f0b8b9f9d7d3b3d3c7f2f0f';
 
     try {
-      await TaskService.deleteTask(id);
+      await TaskService.deleteTask(user, id);
     } catch (err) {
       expect(err.message).toBe('Task not found');
       expect(err.statusCode).toBe(404);
@@ -117,7 +114,7 @@ describe('Task Model', () => {
     };
 
     try {
-      await TaskService.createTask(task);
+      await TaskService.createTask(user, task);
     } catch (err) {
       expect(err.message).toBe('Error creating task');
       expect(err.statusCode).toBe(400);
@@ -126,7 +123,7 @@ describe('Task Model', () => {
 
   test('Should throw error when no tasks are found', async () => {
     try {
-      await TaskService.getTasks();
+      await TaskService.getTasks(user);
     } catch (err) {
       expect(err.message).toBe('No tasks found');
       expect(err.statusCode).toBe(404);
