@@ -3,7 +3,7 @@ import TaskService from '../services/TaskService';
 class TaskController {
   static async createTask(req, res) {
     try {
-      const newTask = await TaskService.createTask(req.body);
+      const newTask = await TaskService.createTask(req.user, req.body);
       res
         .status(201)
         .json({ message: 'Task created successfully', task_id: newTask._id });
@@ -14,7 +14,12 @@ class TaskController {
 
   static async updateTask(req, res) {
     try {
-      const updatedTask = await TaskService.updateTask(req.params.id, req.body);
+      // add req.user
+      const updatedTask = await TaskService.updateTask(
+        req.user,
+        req.params.id,
+        req.body
+      );
       res.status(200).json(updatedTask);
     } catch (err) {
       res.status(500).json(err);
@@ -23,7 +28,7 @@ class TaskController {
 
   static async getTaskById(req, res) {
     try {
-      const task = await TaskService.getTaskById(req.params.id);
+      const task = await TaskService.getTaskById(req.user, req.params.id);
       res.status(200).json(task);
     } catch (err) {
       res.status(500).json(err);
@@ -32,16 +37,19 @@ class TaskController {
 
   static async deleteTask(req, res) {
     try {
-      const deletedTask = await TaskService.deleteTask(req.params.id);
-      res.status(200).json(deletedTask);
+      const deletedTask = await TaskService.deleteTask(req.user, req.params.id);
+      res.status(200).json({ message: deletedTask });
     } catch (err) {
       res.status(500).json(err);
     }
   }
 
   static async getTasks(req, res) {
+    // add back req.user
     try {
-      const tasks = await TaskService.getTasks();
+      const filters = req.query;
+      console.log(filters)
+      const tasks = await TaskService.getTasks(filters);
       res.status(200).json(tasks);
     } catch (err) {
       res.status(500).json(err);
