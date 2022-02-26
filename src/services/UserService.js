@@ -1,19 +1,28 @@
 import User from '../models/User';
 import SecurityService from './SecurityService';
+import EmailService from './EmailService';
 
 class UserService {
   static async createUser(user) {
-    // send mail to validate user
-    // handle duplicate user case
     try {
+
+      const existingUser = User.findOne({email: user.email});
+      if (existingUser) {
+        const error = new Error('User already exists');
+        error.statusCode = 400;
+        throw error;
+      }
+
       const hashed = await SecurityService.hashPassword(user.password);
-      const newUser = new User({
+
+      const newUser = await new User({
         name: user.name,
         email: user.email,
         password: hashed,
-      });
+      }).save();
 
-      return newUser.save();
+      const createdToken = await SecurityService.createToken(newUser);
+      return await EmailService.sendMail(createdToken.token, newUser.email);
     } catch (err) {
       const error = new Error('Error creating user');
       error.statusCode = 500;
@@ -28,6 +37,12 @@ class UserService {
       if (!foundUser) {
         const error = new Error('User not found');
         error.statusCode = 404;
+        throw error;
+      }
+
+      if (!foundUser.verified) {
+        const error = new Error('User not verified');
+        error.statusCode = 400;
         throw error;
       }
 
@@ -54,9 +69,7 @@ class UserService {
         refresh: refreshToken,
       };
     } catch (err) {
-      const error = new Error(err.message);
-      error.statusCode = err.statusCode;
-      throw error;
+      throw err;
     }
   }
 
@@ -89,9 +102,7 @@ class UserService {
   }
 
   static async refreshToken(refresh) {
-    // To refactor, find by token throw the same error than decoded
     try {
-
       const user = await User.findOne({ token: refresh });
 
       if (!user) {
@@ -100,15 +111,36 @@ class UserService {
         throw error;
       }
 
-      const decoded = SecurityService.verifyRefreshToken(refresh);
+      SecurityService.verifyRefreshToken(refresh);
 
-      if (!decoded) {
-        const error = new Error('Not authenticated');
-        error.statusCode = 401;
+      return SecurityService.generateAccessToken(user);
+    } catch (err) {
+      const error = new Error(err.message);
+      error.statusCode = err.statusCode;
+      throw error;
+    }
+  }
+
+  static async verifyEmail(token) {
+    try {
+      const tokenObject = await SecurityService.getToken(token);
+
+      const decoded = SecurityService.verifyUserToken(tokenObject, token);
+      console.log(decoded);
+
+      const user = await User.findOne({ _id: decoded.id, email: decoded.email });
+
+      if (!user) {
+        const error = new Error('No user found');
+        error.statusCode = 404;
         throw error;
       }
 
-      return SecurityService.generateAccessToken(user);
+      user.verified = true;
+      await user.save();
+      await SecurityService.deleteToken(token);
+
+      return 'Email verified';
     } catch (err) {
       const error = new Error(err.message);
       error.statusCode = err.statusCode;

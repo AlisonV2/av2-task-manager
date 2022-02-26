@@ -2,11 +2,11 @@ import UserService from '../services/UserService';
 
 class UserController {
   static async createUser(req, res) {
-    // validate data + create only if admin
     try {
       await UserService.createUser(req.body);
-      res.status(201).json({ 
-        message: 'User created successfully',
+      res.status(201).json({
+        message:
+          'An email has been sent to your account. Please verify your email to complete registration.',
       });
     } catch (err) {
       res.status(500).json(err);
@@ -19,11 +19,11 @@ class UserController {
       res.status(200).json({
         message: 'User logged in successfully',
         data: {
-          ...user
+          ...user,
         },
       });
     } catch (err) {
-      res.status(500).json(err);
+      res.status(err.statusCode).json({ message: err.message });
     }
   }
 
@@ -31,7 +31,7 @@ class UserController {
     try {
       await UserService.logout(req.user);
       res.status(200).json({
-        message: 'User logged out successfully'
+        message: 'User logged out successfully',
       });
     } catch (err) {
       res.status(500).json(err);
@@ -46,6 +46,17 @@ class UserController {
         data: {
           access: accessToken,
         },
+      });
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  }
+
+  static async verifyEmail(req, res) {
+    try {
+      await UserService.verifyEmail(req.params.token);
+      res.status(200).json({
+        message: 'Email verified successfully',
       });
     } catch (err) {
       res.status(500).json(err);

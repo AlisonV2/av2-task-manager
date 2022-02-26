@@ -8,6 +8,7 @@ router
     .post('/', UserController.createUser)
     .post('/login', UserController.login)
     .post('/logout', auth, UserController.logout)
-    .post('/refresh', UserController.refreshToken);
+    .post('/refresh', UserController.refreshToken)
+    .get('/verify/:token', UserController.verifyEmail);
 
 export { router as usersRouter };
