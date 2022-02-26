@@ -5,8 +5,6 @@ const auth = async (req, res, next) => {
     const header = req.headers.authorization;
     const token = header.split(' ')[1];
 
-    console.log(token);
-
     if (!token) {
       const error = new Error('Not authorized');
       error.statusCode = 401;
