@@ -1,7 +1,7 @@
 import UserService from '../services/UserService';
 
 class UserController {
-  static async createUser(req, res) {
+  static async register(req, res) {
     try {
       await UserService.createUser(req.body);
       res.status(201).json({

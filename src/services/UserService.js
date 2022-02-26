@@ -3,10 +3,13 @@ import SecurityService from './SecurityService';
 import EmailService from './EmailService';
 
 class UserService {
+  static async getUserByEmail(email) {
+    return User.findOne({ email: email });
+  }
   static async createUser(user) {
     try {
+      const existingUser = await this.getUserByEmail(user.email);
 
-      const existingUser = User.findOne({email: user.email});
       if (existingUser) {
         const error = new Error('User already exists');
         error.statusCode = 400;
@@ -15,12 +18,21 @@ class UserService {
 
       const hashed = await SecurityService.hashPassword(user.password);
 
-      const newUser = await new User({
+      return await new User({
         name: user.name,
         email: user.email,
         password: hashed,
       }).save();
+    } catch (err) {
+      const error = new Error('Error creating user');
+      error.statusCode = err.statusCode ?? 500;
+      throw error;
+    }
+  }
 
+  static async register(user) {
+    try {
+      const newUser = await this.createUser(user);
       const createdToken = await SecurityService.createToken(newUser);
       return await EmailService.sendMail(createdToken.token, newUser.email);
     } catch (err) {
@@ -29,10 +41,9 @@ class UserService {
       throw error;
     }
   }
-
   static async login(user) {
     try {
-      const foundUser = await User.findOne({ email: user.email });
+      const foundUser = await this.getUserByEmail(user.email);
 
       if (!foundUser) {
         const error = new Error('User not found');
@@ -40,7 +51,7 @@ class UserService {
         throw error;
       }
 
-      if (!foundUser.verified) {
+      if (foundUser.verified === false) {
         const error = new Error('User not verified');
         error.statusCode = 400;
         throw error;
@@ -69,7 +80,9 @@ class UserService {
         refresh: refreshToken,
       };
     } catch (err) {
-      throw err;
+      const error = new Error(err.message);
+      error.statusCode = err.statusCode ?? 500;
+      throw error;
     }
   }
 
@@ -128,7 +141,10 @@ class UserService {
       const decoded = SecurityService.verifyUserToken(tokenObject, token);
       console.log(decoded);
 
-      const user = await User.findOne({ _id: decoded.id, email: decoded.email });
+      const user = await User.findOne({
+        _id: decoded.id,
+        email: decoded.email,
+      });
 
       if (!user) {
         const error = new Error('No user found');

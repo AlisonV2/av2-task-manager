@@ -4,6 +4,8 @@ import Database from './config/Database';
 import { usersRouter } from './routes/users';
 import { docsRouter } from './routes/docs';
 import { tasksRouter } from './routes/tasks';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 

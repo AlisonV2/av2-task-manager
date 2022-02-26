@@ -36,15 +36,17 @@ class TaskService {
         throw error;
       }
 
-      if (task.title) updatedTask.title = task.title;
-      if (task.description) updatedTask.description = task.description;
-      if (task.status) updatedTask.status = task.status;
+      Object.keys(task).forEach((key) => {
+        updatedTask[key] = task[key];
+      });
 
       const savedTask = await updatedTask.save();
 
       return this.formatTask(savedTask);
     } catch (err) {
-      throw err;
+      const error = new Error('Error updating task');
+      error.statusCode = 400;
+      throw error;
     }
   }
 
@@ -86,7 +88,6 @@ class TaskService {
   // status: 'pending' | 'completed' | 'in-progress'
 
   static async getTasks(user, filters) {
-    console.log(user, filters)
     try {
       let formattedTasks = [];
       let match = {};
@@ -98,8 +99,8 @@ class TaskService {
         match.status = filters.status;
       }
 
-      if (filters.sortBy) {
-        const parts = filters.sortBy.split(':');
+      if (filters.sort) {
+        const parts = filters.sort.split(':');
         sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
       }
 

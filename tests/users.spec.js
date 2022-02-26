@@ -2,14 +2,15 @@ import { connect, disconnect, clear } from './fixtures/database';
 import UserService from '../src/services/UserService';
 import { createUser } from './fixtures/users';
 
-beforeAll(async () => connect());
-beforeEach(async () => clear());
+beforeEach(async () => connect());
+afterEach(async () => clear());
 afterAll(async () => disconnect());
 
 const user = {
-  email: 'test123@test.com',
-  name: 'Test123',
+  email: 'user2@test.com',
+  name: 'User2',
   password: 'test123456',
+  verified: true,
 };
 
 describe('User Service', () => {
@@ -18,12 +19,12 @@ describe('User Service', () => {
     expect(createdUser.name).toBe(user.name);
   });
 
-  test('Should return an error if the user already exists', async () => {
+  test('Should return an error if the user already exist', async () => {
     try {
-      await createUser();
+        await UserService.createUser(user);
       await UserService.createUser(user);
     } catch (err) {
-      expect(err.message).toBe('User already exists');
+      expect(err.message).toBe('Error creating user');
       expect(err.statusCode).toBe(400);
     }
   });
@@ -41,20 +42,20 @@ describe('User Service', () => {
   });
 
   test('Should log user in', async () => {
-    await UserService.createUser(user);
+    await createUser();
     const loggedUser = await UserService.login({
-      email: user.email,
-      password: user.password,
+      email: 'user1@test.com',
+      password: 'test123456',
     });
 
-    expect(loggedUser.user).toBe(user.name);
+    expect(loggedUser.user).toBe('User1');
   });
 
-  test('Should return tokens', async () => {
-    await UserService.createUser(user);
+  test('Should log user in', async () => {
+    await createUser();
     const loggedUser = await UserService.login({
-      email: user.email,
-      password: user.password,
+      email: 'user1@test.com',
+      password: 'test123456',
     });
 
     expect(loggedUser.access).toBeTruthy();
@@ -63,10 +64,19 @@ describe('User Service', () => {
 
   test('Should throw an error if user not found', async () => {
     try {
-      await UserService.createUser(user);
+      await UserService.login(user);
+    } catch (err) {
+      expect(err.message).toBe('User not found');
+      expect(err.statusCode).toBe(404);
+    }
+  });
+
+  test('Should throw an error if password in invalid', async () => {
+    try {
+      await createUser();
       await UserService.login({
-        email: user.email,
-        password: 'wrongpassword',
+        email: 'user1@test.com',
+        password: 'wrong-password',
       });
     } catch (err) {
       expect(err.message).toBe('Invalid password');
@@ -74,23 +84,11 @@ describe('User Service', () => {
     }
   });
 
-  test('Should throw an error if password in invalid', async () => {
-    try {
-      await UserService.login({
-        email: 'notfound@test.com',
-        password: 'test123456',
-      });
-    } catch (err) {
-      expect(err.message).toBe('User not found');
-      expect(err.statusCode).toBe(404);
-    }
-  });
-
   test('Should log user out', async () => {
-    const createdUser = await UserService.createUser(user);
+    const createdUser = await createUser();
     await UserService.login({
-      email: user.email,
-      password: user.password,
+      email: 'user1@test.com',
+      password: 'test123456',
     });
 
     const loggedUser = await UserService.getUserById(createdUser._id);
@@ -98,7 +96,6 @@ describe('User Service', () => {
 
     await UserService.logout({ id: createdUser._id });
     const foundUser = await UserService.getUserById(createdUser._id);
-
     expect(foundUser.token).toBeFalsy();
   });
 
@@ -112,10 +109,10 @@ describe('User Service', () => {
   });
 
   test('Should generate new access token', async () => {
-    await UserService.createUser(user);
+    await createUser();
     const loggedUser = await UserService.login({
-      email: user.email,
-      password: user.password,
+        email: 'user1@test.com',
+        password: 'test123456',
     });
 
     const refresh = loggedUser.refresh;
