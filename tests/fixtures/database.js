@@ -12,12 +12,20 @@ const connect = async () => {
     useCreateIndex: true,
     useFindAndModify: false,
   });
-}
+};
 
 const disconnect = async () => {
   await mongoose.connection.dropDatabase();
   await mongoose.connection.close();
   await mongoServer.stop();
-}
+};
 
-export { connect, disconnect };
+const clear = async () => {
+  const collections = mongoose.connection.collections;
+
+  for (const key in collections) {
+    await collections[key].deleteMany();
+  }
+};
+
+export { connect, disconnect, clear };

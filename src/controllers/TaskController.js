@@ -45,9 +45,11 @@ class TaskController {
   }
 
   static async getTasks(req, res) {
+    // add back req.user
     try {
-      // add req.user
-      const tasks = await TaskService.getTasks(req.user);
+      const filters = req.query;
+      console.log(filters)
+      const tasks = await TaskService.getTasks(filters);
       res.status(200).json(tasks);
     } catch (err) {
       res.status(500).json(err);

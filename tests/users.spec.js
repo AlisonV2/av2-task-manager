@@ -1,9 +1,10 @@
-import { connect, disconnect } from './fixtures/database';
+import { connect, disconnect, clear } from './fixtures/database';
 import UserService from '../src/services/UserService';
 import { createUser } from './fixtures/users';
 
-beforeEach(async () => connect());
-afterEach(async () => disconnect());
+beforeAll(async () => connect());
+beforeEach(async () => clear());
+afterAll(async () => disconnect());
 
 const user = {
   email: 'test123@test.com',

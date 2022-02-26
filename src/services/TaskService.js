@@ -77,7 +77,7 @@ class TaskService {
         error.statusCode = 404;
         throw error;
       }
- 
+
       return 'Task deleted successfully';
     } catch (err) {
       const error = new Error(err.message);
@@ -85,11 +85,30 @@ class TaskService {
       throw error;
     }
   }
+  // status: 'pending' | 'completed' | 'in-progress'
 
-  static async getTasks(user) {
+  static async getTasks(filters) {
     try {
       let formattedTasks = [];
-      const tasks = await Task.find({ user: user.id});
+      const match = {};
+      const sort = {};
+      const limit = parseInt(filters.limit);
+      const skip = parseInt(filters.skip);
+
+      if (filters.status) {
+        match.status = filters.status;
+      }
+
+      if (filters.sortBy) {
+        const parts = filters.sortBy.split(':');
+        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
+      }
+
+      const tasks = await Task
+        .find({ ...match })
+        .sort({ ...sort })
+        .skip(skip)
+        .limit(limit);
 
       if (!tasks.length) {
         const error = new Error('No tasks found');

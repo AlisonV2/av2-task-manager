@@ -1,9 +1,10 @@
-import { connect, disconnect } from './fixtures/database';
+import { connect, disconnect, clear } from './fixtures/database';
 import TaskService from '../src/services/TaskService';
 import { createTask } from './fixtures/tasks';
 
-beforeEach(async () => connect());
-afterEach(async () => disconnect());
+beforeAll(async () => connect());
+beforeEach(async () => clear());
+afterAll(async () => disconnect());
 
 const user = {
   id: '5f0b8b9f9d7d3b3d3c7f2f0f',

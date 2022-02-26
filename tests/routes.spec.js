@@ -1,5 +1,7 @@
 import request from 'supertest';
-import app from './fixtures/app';
+import app from '../src/app';
+import { connect, disconnect, clear } from './fixtures/database';
+
 
 describe('Task routes', () => {
   test('Should return newly created task', () => {
