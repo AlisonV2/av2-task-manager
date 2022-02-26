@@ -10,7 +10,7 @@ const user = {
   role: 'user'
 };
 
-describe('Task Model', () => {
+describe('Task Service', () => {
   test('Should create a new Task', async () => {
     const task = {
       title: 'Test task',

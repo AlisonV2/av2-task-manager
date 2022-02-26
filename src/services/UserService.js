@@ -88,13 +88,14 @@ class UserService {
   }
 
   static async refreshToken(refresh) {
+    // To refactor, find by token throw the same error than decoded
     try {
 
       const user = await User.findOne({ token: refresh });
 
       if (!user) {
-        const error = new Error('User not found');
-        error.statusCode = 404;
+        const error = new Error('Not authenticated');
+        error.statusCode = 401;
         throw error;
       }
 
