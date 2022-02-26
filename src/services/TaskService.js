@@ -36,17 +36,15 @@ class TaskService {
         throw error;
       }
 
-      updatedTask.title = task.title;
-      updatedTask.description = task.description;
-      updatedTask.status = task.status;
+      if (task.title) updatedTask.title = task.title;
+      if (task.description) updatedTask.description = task.description;
+      if (task.status) updatedTask.status = task.status;
 
       const savedTask = await updatedTask.save();
 
       return this.formatTask(savedTask);
     } catch (err) {
-      const error = new Error(err.message);
-      error.statusCode = err.statusCode;
-      throw error;
+      throw err;
     }
   }
 
@@ -87,13 +85,14 @@ class TaskService {
   }
   // status: 'pending' | 'completed' | 'in-progress'
 
-  static async getTasks(filters) {
+  static async getTasks(user, filters) {
+    console.log(user, filters)
     try {
       let formattedTasks = [];
-      const match = {};
-      const sort = {};
-      const limit = parseInt(filters.limit);
-      const skip = parseInt(filters.skip);
+      let match = {};
+      let sort = {};
+      let limit = 0;
+      let skip = 0;
 
       if (filters.status) {
         match.status = filters.status;
@@ -104,13 +103,21 @@ class TaskService {
         sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
       }
 
+      if (filters.limit) {
+        limit = parseInt(filters.limit);
+      }
+
+      if (filters.page) {
+        skip = parseInt(filters.page - 1) * limit
+      }
+
       const tasks = await Task
-        .find({ ...match })
+        .find({ user: user.id, ...match })
         .sort({ ...sort })
         .skip(skip)
         .limit(limit);
 
-      if (!tasks.length) {
+      if (tasks.length === 0) {
         const error = new Error('No tasks found');
         error.statusCode = 404;
         throw error;
@@ -121,9 +128,7 @@ class TaskService {
       }
       return formattedTasks;
     } catch (err) {
-      const error = new Error(err.message);
-      error.statusCode = err.statusCode;
-      throw error;
+      throw err;
     }
   }
 }

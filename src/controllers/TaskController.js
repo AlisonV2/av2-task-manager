@@ -40,19 +40,21 @@ class TaskController {
       const deletedTask = await TaskService.deleteTask(req.user, req.params.id);
       res.status(200).json({ message: deletedTask });
     } catch (err) {
-      res.status(500).json(err);
+      res.status(err.statusCode).json({
+        message: err.message,
+      });
     }
   }
 
   static async getTasks(req, res) {
-    // add back req.user
     try {
       const filters = req.query;
-      console.log(filters)
-      const tasks = await TaskService.getTasks(filters);
+      const tasks = await TaskService.getTasks(req.user, filters);
       res.status(200).json(tasks);
     } catch (err) {
-      res.status(500).json(err);
+      res.status(err.statusCode).json({
+        message: err.message,
+      });
     }
   }
 }
