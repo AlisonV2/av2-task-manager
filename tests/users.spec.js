@@ -2,8 +2,8 @@ import { connect, disconnect, clear } from './fixtures/database';
 import UserService from '../src/services/UserService';
 import { createUser } from './fixtures/users';
 
-beforeEach(async () => connect());
-afterEach(async () => clear());
+beforeAll(async () => connect());
+beforeEach(async () => clear());
 afterAll(async () => disconnect());
 
 const user = {
@@ -24,7 +24,7 @@ describe('User Service', () => {
         await UserService.createUser(user);
       await UserService.createUser(user);
     } catch (err) {
-      expect(err.message).toBe('Error creating user');
+      expect(err.message).toBe('User already exists');
       expect(err.statusCode).toBe(400);
     }
   });
@@ -36,8 +36,8 @@ describe('User Service', () => {
         name: 'EmptyEmail',
       });
     } catch (err) {
-      expect(err.message).toBe('Error creating user');
-      expect(err.statusCode).toBe(500);
+      expect(err.message).toBe('Missing required fields');
+      expect(err.statusCode).toBe(400);
     }
   });
 

@@ -50,6 +50,11 @@ class TaskController {
     try {
       const filters = req.query;
       const tasks = await TaskService.getTasks(req.user, filters);
+      if (tasks.length === 0) {
+        res.status(404).json({
+          message: 'No task found',
+        });
+      }
       res.status(200).json(tasks);
     } catch (err) {
       res.status(err.statusCode).json({

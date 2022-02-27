@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import TokenRepository from '../repositories/TokenRepository';
 import Token from '../models/Token';
 
 dotenv.config();
@@ -17,7 +18,7 @@ class SecurityService {
   static generateAccessToken(user) {
     return jwt.sign(
       {
-        id: user._id.toString(),
+        id: user.id,
         role: user.role,
       },
       process.env.ACCESS_TOKEN,
@@ -28,7 +29,7 @@ class SecurityService {
   static generateRefreshToken(user) {
     return jwt.sign(
       {
-        id: user._id.toString(),
+        id: user.id,
         role: user.role,
       },
       process.env.REFRESH_TOKEN
@@ -38,7 +39,7 @@ class SecurityService {
   static generateUserToken(user) {
     return jwt.sign(
       {
-        id: user._id.toString(),
+        id: user.id,
         email: user.email,
       },
       process.env.USER_TOKEN
@@ -46,22 +47,31 @@ class SecurityService {
   }
 
   static verifyAccessToken(token) {
-    return jwt.verify(token, process.env.ACCESS_TOKEN);
+    try {
+      return jwt.verify(token, process.env.ACCESS_TOKEN);
+    } catch (err) {
+      const error = new Error('Invalid access token');
+      error.statusCode = 401;
+      throw error;
+    }
   }
 
   static verifyRefreshToken(token) {
-    const refresh = jwt.verify(token, process.env.REFRESH_TOKEN);
-    if (!refresh) {
+    try {
+      return jwt.verify(token, process.env.REFRESH_TOKEN);
+    } catch (err) {
       const error = new Error('Invalid refresh token');
       error.statusCode = 401;
       throw error;
     }
-    return refresh;
   }
 
   static verifyUserToken(tokenObject, codedToken) {
     const userToken = jwt.verify(codedToken, process.env.USER_TOKEN);
-    if (tokenObject.email !== userToken.email || tokenObject.user !== userToken.id ) {
+    if (
+      tokenObject.email !== userToken.email ||
+      tokenObject.user !== userToken.id
+    ) {
       const error = new Error('Invalid link');
       error.statusCode = 401;
       throw error;
@@ -70,27 +80,23 @@ class SecurityService {
   }
 
   static async createToken(user) {
-    const token = new Token({
-      user: user._id.toString(),
-      token: this.generateUserToken(user),
-      email: user.email
-    });
-
-    return token.save();
+    const token = this.generateUserToken(user);
+    return TokenRepository.createToken(user, token);
   }
 
   static async getToken(token) {
-    const tokenObject = await Token.findOne({ token });
-    if (!tokenObject) {
+    const foundToken = await TokenRepository.getToken({ token })
+    if (!foundToken) {
       const error = new Error('Invalid link');
       error.statusCode = 404;
       throw error;
     }
-    return tokenObject;
+    return foundToken;
   }
 
   static async deleteToken(token) {
-    return Token.deleteOne({ token });
+    await this.getToken(token)
+    return TokenRepository.deleteToken({ token });
   }
 }
 

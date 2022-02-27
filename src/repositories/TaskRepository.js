@@ -9,12 +9,12 @@ class TaskRepository {
     return newTask.save();
   }
 
-  static async findTask(query) {
+  static async getTask(query) {
     return Task.findOne({ ...query });
   }
 
   static async updateTask(query, task) {
-    const updatedTask = await this.findTask(query);
+    const updatedTask = await this.getTask(query);
 
     Object.keys(task).forEach((key) => {
       updatedTask[key] = task[key];
@@ -25,6 +25,14 @@ class TaskRepository {
 
   static async deleteTask(query) {
     return Task.findOneAndDelete({ ...query });
+  }
+
+  static async getTasks(match, sort, skip, limit) {
+    return Task
+    .find({ ...match })
+    .sort({ ...sort })
+    .skip(skip)
+    .limit(limit);
   }
 }
 
