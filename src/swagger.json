@@ -24,7 +24,7 @@
   "tags": [
     {
       "name": "tasks",
-      "description": "Access to tasks operations"
+      "description": "Tasks service"
     },
     {
       "name": "users",
@@ -59,7 +59,7 @@
             "content": {}
           },
           "404": {
-            "description": "Pet not found",
+            "description": "Task not found",
             "content": {}
           },
           "405": {
@@ -71,22 +71,16 @@
           {
             "BearerAuth": []
           }
-        ],
-        "x-codegen-request-body-name": "body"
+        ]
       },
       "post": {
         "tags": ["tasks"],
         "summary": "Create a new task",
         "operationId": "createTask",
         "requestBody": {
-          "description": "Task object that needs to be added to the store",
+          "description": "Task object that needs to be created",
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Task"
-              }
-            },
-            "application/xml": {
               "schema": {
                 "$ref": "#/components/schemas/Task"
               }
@@ -95,6 +89,10 @@
           "required": true
         },
         "responses": {
+          "201": {
+            "description": "Task created successfully",
+            "content": {}
+          },
           "405": {
             "description": "Invalid input",
             "content": {}
@@ -107,7 +105,7 @@
         ]
       }
     },
-    "/tasks/{taskId}": {
+    "/tasks/{id}": {
       "get": {
         "tags": ["tasks"],
         "summary": "Find task by ID",
@@ -115,7 +113,7 @@
         "operationId": "getTaskById",
         "parameters": [
           {
-            "name": "taskId",
+            "name": "idd",
             "in": "path",
             "description": "ID of task to return",
             "required": true,
@@ -129,11 +127,6 @@
           "200": {
             "description": "successful operation",
             "content": {
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/Task"
-                }
-              },
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Task"
@@ -146,7 +139,7 @@
             "content": {}
           },
           "404": {
-            "description": "Pet not found",
+            "description": "Task not found",
             "content": {}
           }
         },
@@ -162,9 +155,9 @@
         "operationId": "deleteTask",
         "parameters": [
           {
-            "name": "taskId",
+            "name": "id",
             "in": "path",
-            "description": "Task id to delete",
+            "description": "Task ID to delete",
             "required": true,
             "schema": {
               "type": "integer",
@@ -178,63 +171,8 @@
             "content": {}
           },
           "404": {
-            "description": "Pet not found",
+            "description": "Task not found",
             "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/tasks/{taskId}/upload": {
-      "post": {
-        "tags": ["tasks"],
-        "summary": "uploads a file",
-        "operationId": "uploadFile",
-        "parameters": [
-          {
-            "name": "taskId",
-            "in": "path",
-            "description": "ID of task to update",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "properties": {
-                  "additionalMetadata": {
-                    "type": "string",
-                    "description": "Additional data to pass to server"
-                  },
-                  "file": {
-                    "type": "string",
-                    "description": "file to upload",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                }
-              }
-            }
           }
         },
         "security": [
@@ -248,7 +186,7 @@
       "post": {
         "tags": ["users"],
         "summary": "Create user",
-        "description": "This can only be done by the logged in user.",
+        "description": "User object that needs to be created",
         "operationId": "createUser",
         "requestBody": {
           "description": "Created user object",
@@ -262,73 +200,41 @@
           "required": true
         },
         "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {}
+          },
           "default": {
             "description": "successful operation",
             "content": {}
           }
-        },
-        "x-codegen-request-body-name": "body"
+        }
       }
     },
     "/users/login": {
-      "get": {
+      "post": {
         "tags": ["users"],
-        "summary": "Logs user into the system",
-        "operationId": "loginUser",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "query",
-            "description": "The user name for login",
-            "required": true,
-            "schema": {
-              "type": "string"
+        "summary": "Login user",
+        "description": "",
+        "operationId": "login",
+        "requestBody": {
+          "description": "User credentials",
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
             }
           },
-          {
-            "name": "password",
-            "in": "query",
-            "description": "The password for login in clear text",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+          "required": true
+        },
         "responses": {
           "200": {
-            "description": "successful operation",
-            "headers": {
-              "X-Rate-Limit": {
-                "description": "calls per hour allowed by the user",
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              },
-              "X-Expires-After": {
-                "description": "date in UTC when token expires",
-                "schema": {
-                  "type": "string",
-                  "format": "date-time"
-                }
-              }
-            },
-            "content": {
-              "application/xml": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": "User logged in successfully",
+            "content": {}
           },
-          "400": {
-            "description": "Invalid username/password supplied",
+          "default": {
+            "description": "successful operation",
             "content": {}
           }
         }
@@ -521,7 +427,8 @@
     "securitySchemes": {
       "BearerAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }

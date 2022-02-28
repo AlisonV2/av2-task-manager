@@ -18,6 +18,10 @@ const Task = Database.createModel(
       enum: ['pending', 'in-progress', 'completed'],
       default: 'pending',
     },
+    user: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,
