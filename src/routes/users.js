@@ -5,9 +5,10 @@ import auth from '../middleware/auth';
 const router = express.Router();
 
 router
-    .post('/', UserController.createUser)
+    .post('/', UserController.register)
     .post('/login', UserController.login)
-    .post('/logout', auth, UserController.logout)
-    .post('/refresh', UserController.refreshToken);
+    .get('/logout', auth, UserController.logout)
+    .post('/refresh', UserController.refreshToken)
+    .get('/verify/:token', UserController.verifyEmail);
 
 export { router as usersRouter };

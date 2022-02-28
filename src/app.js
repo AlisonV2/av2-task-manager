@@ -4,6 +4,8 @@ import Database from './config/Database';
 import { usersRouter } from './routes/users';
 import { docsRouter } from './routes/docs';
 import { tasksRouter } from './routes/tasks';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 
@@ -16,7 +18,6 @@ app.use(Server.setHeaders);
 app.use('/api/docs', docsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/tasks', tasksRouter);
-app.use(Server.handleErrors);
 
 if (process.env.NODE_ENV !== 'test') {
   Database.start('dev');

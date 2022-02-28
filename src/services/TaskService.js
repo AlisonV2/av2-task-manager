@@ -1,4 +1,4 @@
-import Task from '../models/Task';
+import TaskRepository from '../repositories/TaskRepository';
 
 class TaskService {
   static formatTask(task) {
@@ -11,14 +11,15 @@ class TaskService {
   }
   static async createTask(user, task) {
     try {
-      const newTask = new Task({
+      const newTask = {
         title: task.title,
         description: task.description,
         status: task.status,
         user: user.id,
-      });
+      };
 
-      return await newTask.save();
+      const createdTask = await TaskRepository.createTask(newTask);
+      return this.formatTask(createdTask);
     } catch (err) {
       const error = new Error('Error creating task');
       error.statusCode = 400;
@@ -28,68 +29,47 @@ class TaskService {
 
   static async updateTask(user, id, task) {
     try {
-      const updatedTask = await Task.findOne({ _id: id, user: user.id });
+      const query = { _id: id, user: user.id };
+      const updatedTask = await TaskRepository.updateTask(query, task);
 
-      if (!updatedTask) {
-        const error = new Error('Task not found');
-        error.statusCode = 404;
-        throw error;
-      }
-
-      if (task.title) updatedTask.title = task.title;
-      if (task.description) updatedTask.description = task.description;
-      if (task.status) updatedTask.status = task.status;
-
-      const savedTask = await updatedTask.save();
-
-      return this.formatTask(savedTask);
+      return this.formatTask(updatedTask);
     } catch (err) {
-      throw err;
+      const error = new Error('Error updating task');
+      error.statusCode = 400;
+      throw error;
     }
   }
 
   static async getTaskById(user, id) {
     try {
-      const task = await Task.findOne({ _id: id, user: user.id });
-
-      if (!task) {
-        const error = new Error('Task not found');
-        error.statusCode = 404;
-        throw error;
-      }
+      const query = { _id: id, user: user.id };
+      const task = await TaskRepository.getTask(query);
 
       return this.formatTask(task);
     } catch (err) {
-      const error = new Error(err.message);
-      error.statusCode = err.statusCode;
+      const error = new Error('Task not found');
+      error.statusCode = 404;
       throw error;
     }
   }
 
   static async deleteTask(user, id) {
     try {
-      const task = await Task.findOneAndDelete({ _id: id, user: user.id });
-
-      if (!task) {
-        const error = new Error('Task not found');
-        error.statusCode = 404;
-        throw error;
-      }
+      const query = { _id: id, user: user.id };
+      await TaskRepository.deleteTask(query);
 
       return 'Task deleted successfully';
     } catch (err) {
-      const error = new Error(err.message);
-      error.statusCode = err.statusCode;
+      const error = new Error('Task not found');
+      error.statusCode = 404;
       throw error;
     }
   }
   // status: 'pending' | 'completed' | 'in-progress'
 
   static async getTasks(user, filters) {
-    console.log(user, filters)
     try {
-      let formattedTasks = [];
-      let match = {};
+      let match = { user: user.id };
       let sort = {};
       let limit = 0;
       let skip = 0;
@@ -98,8 +78,8 @@ class TaskService {
         match.status = filters.status;
       }
 
-      if (filters.sortBy) {
-        const parts = filters.sortBy.split(':');
+      if (filters.sort) {
+        const parts = filters.sort.split(':');
         sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
       }
 
@@ -108,27 +88,24 @@ class TaskService {
       }
 
       if (filters.page) {
-        skip = parseInt(filters.page - 1) * limit
+        skip = parseInt(filters.page - 1) * limit;
       }
 
-      const tasks = await Task
-        .find({ user: user.id, ...match })
-        .sort({ ...sort })
-        .skip(skip)
-        .limit(limit);
+      const tasks = await TaskRepository.getTasks(match, sort, skip, limit);
 
       if (tasks.length === 0) {
-        const error = new Error('No tasks found');
-        error.statusCode = 404;
-        throw error;
+        throw new Error('No tasks found');
       }
 
+      let formattedTasks = [];
       for (let i in tasks) {
         formattedTasks.push(this.formatTask(tasks[i]));
       }
       return formattedTasks;
     } catch (err) {
-      throw err;
+      const error = new Error('No tasks found');
+      error.statusCode = 404;
+      throw error;
     }
   }
 }

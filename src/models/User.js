@@ -28,6 +28,10 @@ const User = Database.createModel('User', {
     type: String,
     default: null,
   },
+  verified: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 export default User;

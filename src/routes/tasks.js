@@ -6,7 +6,7 @@ const router = express.Router();
 
 // GET /tasks?status=pending||in-progress || completed
 // GET /tasks?page=2&limit=10
-// GET /tasks?status=pending&sortBy=title:asc
+// GET /tasks?status=pending&sort=title:asc
 router
     .post('/', auth, TaskController.createTask)
     .get('/', auth, TaskController.getTasks)

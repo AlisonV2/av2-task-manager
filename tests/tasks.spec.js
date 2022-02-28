@@ -1,6 +1,6 @@
 import { connect, disconnect, clear } from './fixtures/database';
 import TaskService from '../src/services/TaskService';
-import { createTask } from './fixtures/tasks';
+import { createTask, createManyTasks } from './fixtures/tasks';
 
 beforeAll(async () => connect());
 beforeEach(async () => clear());
@@ -64,7 +64,7 @@ describe('Task Service', () => {
 
   test('Should get all tasks', async () => {
     const createdTask = await createTask();
-    const foundTasks = await TaskService.getTasks(user);
+    const foundTasks = await TaskService.getTasks(user, {});
 
     expect(foundTasks.length).toBe(1);
     expect(foundTasks[0].title).toBe(createdTask.title);
@@ -82,8 +82,8 @@ describe('Task Service', () => {
     try {
       await TaskService.updateTask(user, id, task);
     } catch (err) {
-      expect(err.message).toBe('Task not found');
-      expect(err.statusCode).toBe(404);
+      expect(err.message).toBe('Error updating task');
+      expect(err.statusCode).toBe(400);
     }
   });
 
@@ -124,10 +124,63 @@ describe('Task Service', () => {
 
   test('Should throw error when no tasks are found', async () => {
     try {
-      await TaskService.getTasks(user);
+      await TaskService.getTasks(user, {});
     } catch (err) {
       expect(err.message).toBe('No tasks found');
       expect(err.statusCode).toBe(404);
     }
+  })
+
+  test('Should get tasks where status is pending', async () => {
+    const createdTask = await createTask();
+    const foundTasks = await TaskService.getTasks(user, {status: 'pending'});
+
+    expect(foundTasks.length).toBe(1);
+    expect(foundTasks[0].title).toBe(createdTask.title);
+    expect(foundTasks[0].description).toBe(createdTask.description);
+    expect(foundTasks[0].status).toBe('pending');
+  })
+
+  test('Should return an empty array as no task is completed', async () => {
+    await createTask();
+    try {
+      await TaskService.getTasks(user, {status: 'completed'});
+    } catch (err) {
+      expect(err.message).toBe('No tasks found');
+      expect(err.statusCode).toBe(404);
+    }
+  })
+
+  test('Should return filtered tasks', async () => {
+    await createManyTasks();
+    const foundTasks = await TaskService.getTasks(user, { status: 'pending'});
+
+    expect(foundTasks.length).toBe(2);
+  })
+
+  test('Should return reversed-ordered tasks', async () => {
+    await createManyTasks();
+    const foundTasks = await TaskService.getTasks(user, { sort: 'title:desc'});
+    expect(foundTasks[0].title).toBe('F - New task');
+  })
+
+  test('Should return ordered tasks', async () => {
+    await createManyTasks();
+    const foundTasks = await TaskService.getTasks(user, { sort: 'title:asc'});
+    expect(foundTasks[0].title).toBe('A - New task');
+  })
+
+  test('Should return limited tasks', async () => {
+    await createManyTasks();
+    const foundTasks = await TaskService.getTasks(user, { limit: 3});
+    expect(foundTasks[0].title).toBe('A - New task');
+    expect(foundTasks.length).toBe(3);
+  })
+
+  test('Should return paginated tasks', async () => {
+    await createManyTasks();
+    const foundTasks = await TaskService.getTasks(user, { page: 2, limit: 3 });
+    expect(foundTasks[0].title).toBe('D - New task');
+    expect(foundTasks.length).toBe(3);
   })
 });
