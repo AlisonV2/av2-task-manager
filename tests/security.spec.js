@@ -1,7 +1,6 @@
 import { connect, disconnect, clear } from './fixtures/database';
 import SecurityService from '../src/services/SecurityService';
 import { createToken } from './fixtures/security';
-import Token from '../src/models/Token';
 
 beforeAll(async () => connect());
 beforeEach(async () => clear());

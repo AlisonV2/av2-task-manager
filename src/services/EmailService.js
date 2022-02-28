@@ -31,7 +31,9 @@ class EmailService {
       return `Message sent to: ${email}`;
     } catch (err) {
       console.log(err.message);
-      return { error: err.message };
+      const error = new Error(err.message);
+      error.statusCode = 500;
+      throw error;
     }
   }
 }
