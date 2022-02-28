@@ -12,9 +12,6 @@ class UserService {
       role: user.role,
     };
   }
-  static async getUserByEmail(email) {
-    return User.findOne({ email: email });
-  }
   static async createUser(user) {
     const existingUser = await UserRepository.getUser({ email: user.email });
 
@@ -24,7 +21,6 @@ class UserService {
       throw error;
     }
 
-    // Add data validation
     if (!user.name || !user.email || !user.password) {
       const error = new Error('Missing required fields');
       error.statusCode = 400;
@@ -47,8 +43,8 @@ class UserService {
       const createdToken = await SecurityService.createToken(newUser);
       return await EmailService.sendMail(createdToken.token, newUser.email);
     } catch (err) {
-      const error = new Error('Error creating user');
-      error.statusCode = 400;
+      const error = new Error(err.message);
+      error.statusCode = err.statusCode;
       throw error;
     }
   }

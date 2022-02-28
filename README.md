@@ -1,4 +1,4 @@
-# Task Manager - Alison Vandromme ![check-code-coverage](https://img.shields.io/badge/code--coverage-96.6%25-brightgreen)
+# Task Manager - Alison Vandromme ![check-code-coverage](https://img.shields.io/badge/code--coverage-98.1%25-brightgreen)
 
 Bordeaux Ynov M1 - Web Services (March 2022)
 
