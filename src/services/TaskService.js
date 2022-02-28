@@ -93,13 +93,17 @@ class TaskService {
 
       const tasks = await TaskRepository.getTasks(match, sort, skip, limit);
 
+      if (tasks.length === 0) {
+        throw new Error('No tasks found');
+      }
+
       let formattedTasks = [];
       for (let i in tasks) {
         formattedTasks.push(this.formatTask(tasks[i]));
       }
       return formattedTasks;
     } catch (err) {
-      const error = new Error('Error getting tasks');
+      const error = new Error('No tasks found');
       error.statusCode = 404;
       throw error;
     }

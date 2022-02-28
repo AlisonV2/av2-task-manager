@@ -14,4 +14,14 @@ const createUser = async () => {
   return newUser.save();
 };
 
-export { createUser };
+const createAccessToken = async () => {
+  const user = await createUser();
+  const token = await SecurityService.generateAccessToken({
+    ...user,
+    id: user._id.toString(),
+  });
+
+  return { user, token };
+};
+
+export { createUser, createAccessToken };

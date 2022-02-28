@@ -6,9 +6,9 @@ class TaskController {
       const newTask = await TaskService.createTask(req.user, req.body);
       res
         .status(201)
-        .json({ message: 'Task created successfully', task_id: newTask._id });
+        .json({ message: 'Task created successfully', data: newTask._id });
     } catch (err) {
-      res.status(500).json(err);
+      res.status(err.statusCode).json({ message: err.message });
     }
   }
 
@@ -20,18 +20,20 @@ class TaskController {
         req.params.id,
         req.body
       );
-      res.status(200).json(updatedTask);
+      res
+        .status(200)
+        .json({ message: 'Task updated successfully', data: updatedTask });
     } catch (err) {
-      res.status(500).json(err);
+      res.status(err.statusCode).json({ message: err.message });
     }
   }
 
   static async getTaskById(req, res) {
     try {
       const task = await TaskService.getTaskById(req.user, req.params.id);
-      res.status(200).json(task);
+      res.status(200).json({ data: task });
     } catch (err) {
-      res.status(500).json(err);
+      res.status(err.statusCode).json({ message: err.message });
     }
   }
 
@@ -50,12 +52,7 @@ class TaskController {
     try {
       const filters = req.query;
       const tasks = await TaskService.getTasks(req.user, filters);
-      if (tasks.length === 0) {
-        res.status(404).json({
-          message: 'No task found',
-        });
-      }
-      res.status(200).json(tasks);
+      res.status(200).json({ data: tasks });
     } catch (err) {
       res.status(err.statusCode).json({
         message: err.message,

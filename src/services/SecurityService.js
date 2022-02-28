@@ -2,7 +2,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import TokenRepository from '../repositories/TokenRepository';
-import Token from '../models/Token';
 
 dotenv.config();
 
