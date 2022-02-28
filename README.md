@@ -13,13 +13,36 @@ Bordeaux Ynov M1 - Web Services (March 2022)
 
 ## Application architecture
 
+## Endpoints
+
+### Users
+
+- POST /users : Create a new user, sends an email to the user with a link to activate the account.
+- POST /users/login : Login a user.
+- GET /users/logout : Logout a user. Need to be authenticated.
+- GET /users/verify/:token : Verify a user account.
+- POST /users/refresh : Refresh a user token.
+
+### Tasks
+
+All tasks are only those created by the logged in user.
+Tasks endpoints required authentication in order to access them.
+
+Authentication is provided through HTTP Header Authorization, in the following format: 
+'Bearer <access_token>'
+
+- POST /tasks : Create a new task
+- GET /tasks : Get all tasks
+- GET /tasks/:id : Get a task by id
+- PUT /tasks/:id : Update a task by id
+- DELETE /tasks/:id : Delete a task by id
 
 ## Documentation
 
 The documentation is made in OpenAPI 3.0 format.
 It is generated from swagger.json file and loaded through [swagger-ui-express](https://github.com/scottie1984/swagger-ui-express).
 
-One the application is running, it can be found on localhost:5000/api/docs.
+One the application is running, it can be found on localhost:3000/api/docs.
 
 ## Workflow
 
@@ -34,11 +57,17 @@ npm run dev
 
 ## Tests
 
-Tests are ran with jest. To launch the test suite, run: 
+- Unit tests are ran with Jest
+- Integration tests are ran with Jest and Supertest
+- MongoDB is mocked through [mongodb-memory-server](https://github.com/nodkz/mongodb-memory-server)
+
+To launch the test suite, run: 
 
 ``` sh
 npm run test
 ```
+
+Coverage is found in /coverage folder. 
 
 ## Utilities
 
