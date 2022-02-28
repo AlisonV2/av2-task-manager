@@ -1,4 +1,5 @@
 import User from '../../src/models/User';
+import Token from '../../src/models/Token';
 import SecurityService from '../../src/services/SecurityService';
 
 const createUser = async () => {
@@ -16,7 +17,7 @@ const createUser = async () => {
 
 const createAccessToken = async () => {
   const user = await createUser();
-  const token = await SecurityService.generateAccessToken({
+  const token = SecurityService.generateAccessToken({
     ...user,
     id: user._id.toString(),
   });
@@ -24,4 +25,25 @@ const createAccessToken = async () => {
   return { user, token };
 };
 
-export { createUser, createAccessToken };
+const deleteUser = async (id) => {
+  return User.findByIdAndDelete(id);
+}
+
+const createUserToken = async () => {
+  const user = await createUser();
+  const token = SecurityService.generateUserToken({
+    email: user.email,
+    id: user._id.toString(),
+  });
+
+  const newToken = new Token({
+    user: user._id.toString(),
+    token,
+    email: user.email
+  });
+
+  return newToken.save();
+}
+
+
+export { createUser, createAccessToken, deleteUser, createUserToken };

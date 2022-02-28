@@ -46,23 +46,11 @@ class SecurityService {
   }
 
   static verifyAccessToken(token) {
-    try {
       return jwt.verify(token, process.env.ACCESS_TOKEN);
-    } catch (err) {
-      const error = new Error('Invalid access token');
-      error.statusCode = 401;
-      throw error;
-    }
   }
 
   static verifyRefreshToken(token) {
-    try {
-      return jwt.verify(token, process.env.REFRESH_TOKEN);
-    } catch (err) {
-      const error = new Error('Invalid refresh token');
-      error.statusCode = 401;
-      throw error;
-    }
+    return jwt.verify(token, process.env.REFRESH_TOKEN);
   }
 
   static verifyUserToken(tokenObject, codedToken) {
@@ -71,9 +59,7 @@ class SecurityService {
       tokenObject.email !== userToken.email ||
       tokenObject.user !== userToken.id
     ) {
-      const error = new Error('Invalid link');
-      error.statusCode = 401;
-      throw error;
+      throw new Error('Invalid link');
     }
     return userToken;
   }

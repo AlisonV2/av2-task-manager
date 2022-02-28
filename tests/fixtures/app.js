@@ -7,8 +7,8 @@ import { tasksRouter } from '../../src/routes/tasks';
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(Server.setHeaders);
 app.use('/api/users', usersRouter);
 app.use('/api/tasks', tasksRouter);
-app.use(Server.handleErrors);
 
 export default app;

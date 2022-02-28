@@ -7,7 +7,7 @@ const router = express.Router();
 router
     .post('/', UserController.register)
     .post('/login', UserController.login)
-    .post('/logout', auth, UserController.logout)
+    .get('/logout', auth, UserController.logout)
     .post('/refresh', UserController.refreshToken)
     .get('/verify/:token', UserController.verifyEmail);
 

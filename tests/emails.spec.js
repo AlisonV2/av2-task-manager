@@ -15,7 +15,7 @@ beforeEach(() => {
 
 describe('Email Service', () => {
   test('Should create transporter', async () => {
-    await EmailService.createTransporter();
+    EmailService.createTransporter();
     expect(nodemailer.createTransport).toHaveBeenCalledTimes(1);
   });
 

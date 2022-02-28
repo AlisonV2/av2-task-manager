@@ -155,7 +155,6 @@ class UserService {
   static async verifyEmail(token) {
     try {
       const tokenObject = await SecurityService.getToken(token);
-
       const decoded = SecurityService.verifyUserToken(tokenObject, token);
 
       const user = await UserRepository.getUser({
@@ -169,12 +168,7 @@ class UserService {
         throw error;
       }
 
-      const verifiedUser = { 
-        ...user,
-        verified: true,
-      };
-
-      await UserRepository.updateUser(verifiedUser);
+      await UserRepository.verifyUser(user._id);
       await SecurityService.deleteToken(token);
 
       return 'Email verified';

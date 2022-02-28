@@ -9,7 +9,9 @@ class UserController {
           'An email has been sent to your account. Please verify your email to complete registration.',
       });
     } catch (err) {
-      res.status(500).json(err);
+      res
+        .status(err.statusCode)
+        .json({ message: err.message });
     }
   }
 
@@ -23,7 +25,9 @@ class UserController {
         },
       });
     } catch (err) {
-      res.status(err.statusCode).json({ message: err.message });
+      res
+        .status(err.statusCode)
+        .json({ message: err.message });
     }
   }
 
@@ -34,7 +38,9 @@ class UserController {
         message: 'User logged out successfully',
       });
     } catch (err) {
-      res.status(500).json(err);
+      res
+        .status(err.statusCode)
+        .json({ message: err.message });
     }
   }
 
@@ -48,7 +54,9 @@ class UserController {
         },
       });
     } catch (err) {
-      res.status(500).json(err);
+      res
+        .status(err.statusCode)
+        .json({ message: err.message });
     }
   }
 
@@ -59,7 +67,9 @@ class UserController {
         message: 'Email verified successfully',
       });
     } catch (err) {
-      res.status(500).json(err);
+      res
+        .status(err.statusCode)
+        .json({ message: err.message });
     }
   }
 }

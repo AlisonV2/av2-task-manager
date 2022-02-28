@@ -198,5 +198,14 @@ describe('Task routes', () => {
       .expect(404);
 
     expect(response.body.message).toBe('No tasks found');
-  })
+  });
+
+  test('Should throw an error when token is invalid', async () => {
+    const response = await request(app)
+      .delete('/api/tasks/1234')
+      .set('Authorization', `Bearer invalid-token`)
+      .expect(401);
+
+      expect(response.body.message).toBe('Not authorized');
+  });
 });

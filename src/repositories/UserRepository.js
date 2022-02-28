@@ -17,6 +17,12 @@ class UserRepository {
     });
     return updatedUser.save();
   }
+
+  static async verifyUser(id) {
+    const user = await this.getUser({ _id: id });
+    user.verified = true;
+    return user.save();
+  }
 }
 
 export default UserRepository;
