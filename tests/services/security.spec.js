@@ -1,6 +1,6 @@
-import { connect, disconnect, clear } from './fixtures/database';
-import SecurityService from '../src/services/SecurityService';
-import { createToken } from './fixtures/security';
+import { connect, disconnect, clear } from '../fixtures/database';
+import SecurityService from '../../src/services/SecurityService';
+import { createToken } from '../fixtures/security';
 
 beforeAll(async () => connect());
 beforeEach(async () => clear());

@@ -28,6 +28,7 @@ class TaskService {
   }
 
   static async updateTask(user, id, task) {
+    // check what fields can be updated
     try {
       const query = { _id: id, user: user.id };
       const updatedTask = await TaskRepository.updateTask(query, task);

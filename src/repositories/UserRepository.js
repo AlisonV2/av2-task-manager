@@ -1,6 +1,15 @@
 import User from '../models/User';
 
 class UserRepository {
+  static formatUser(user) {
+    return {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+  }
+  
   static async getUser(query) {
     return User.findOne({ ...query });
   }
@@ -11,6 +20,7 @@ class UserRepository {
   }
 
   static async updateUser(user) {
+    // check what fields can be updated
     const updatedUser = await this.getUser({ _id: user.id });
     Object.keys(user).forEach((key) => {
       updatedUser[key] = user[key];
@@ -22,6 +32,11 @@ class UserRepository {
     const user = await this.getUser({ _id: id });
     user.verified = true;
     return user.save();
+  }
+
+  static async deleteUser(id) {
+    const user = await this.getUser({ _id: id });
+    return user.remove();
   }
 }
 

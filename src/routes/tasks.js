@@ -1,6 +1,6 @@
 import express from 'express';
 import TaskController from '../controllers/TaskController';
-import auth from '../middleware/auth';
+import authenticate from '../middleware/authenticate';
 
 const router = express.Router();
 
@@ -8,10 +8,10 @@ const router = express.Router();
 // GET /tasks?page=2&limit=10
 // GET /tasks?status=pending&sort=title:asc
 router
-    .post('/', auth, TaskController.createTask)
-    .get('/', auth, TaskController.getTasks)
-    .get('/:id', auth, TaskController.getTaskById)
-    .put('/:id', auth, TaskController.updateTask)
-    .delete('/:id', auth, TaskController.deleteTask);
+    .post('/', authenticate, TaskController.createTask)
+    .get('/', authenticate, TaskController.getTasks)
+    .get('/:id', authenticate, TaskController.getTaskById)
+    .put('/:id', authenticate, TaskController.updateTask)
+    .delete('/:id', authenticate, TaskController.deleteTask);
 
 export { router as tasksRouter };

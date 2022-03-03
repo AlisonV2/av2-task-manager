@@ -1,14 +1,15 @@
 import express from 'express';
 import UserController from '../controllers/UserController';
-import auth from '../middleware/auth';
+import authenticate from '../middleware/authenticate';
 
 const router = express.Router();
 
 router
     .post('/', UserController.register)
-    .post('/login', UserController.login)
-    .get('/logout', auth, UserController.logout)
-    .post('/refresh', UserController.refreshToken)
-    .get('/verify/:token', UserController.verifyEmail);
+    .put('/', authenticate, UserController.updateUser)
+    .get('/', authenticate, UserController.getUser)
+    .delete('/', authenticate, UserController.deleteUser)
 
 export { router as usersRouter };
+
+// Add reset password 

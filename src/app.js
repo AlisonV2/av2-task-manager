@@ -4,6 +4,9 @@ import Database from './config/Database';
 import { usersRouter } from './routes/users';
 import { docsRouter } from './routes/docs';
 import { tasksRouter } from './routes/tasks';
+import { tokensRouter } from './routes/tokens';
+import { sessionsRouter } from './routes/sessions';
+
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -18,6 +21,8 @@ app.use(Server.setHeaders);
 app.use('/api/docs', docsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/tasks', tasksRouter);
+app.use('/api/tokens', tokensRouter);
+app.use('/api/sessions', sessionsRouter);
 
 if (process.env.NODE_ENV !== 'test') {
   Database.start('dev');
