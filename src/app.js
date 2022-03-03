@@ -24,8 +24,6 @@ app.use('/api/tasks', tasksRouter);
 app.use('/api/tokens', tokensRouter);
 app.use('/api/sessions', sessionsRouter);
 
-if (process.env.NODE_ENV !== 'test') {
-  Database.start('dev');
-}
+Database.start();
 
 export default app;

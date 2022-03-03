@@ -1,6 +1,15 @@
 import Task from '../models/Task';
 
 class TaskRepository {
+  static formatTask(task) {
+    return {
+      id: task._id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+    };
+  }
+  
   static async createTask(task) {
     const newTask = new Task({
       ...task,

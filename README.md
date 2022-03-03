@@ -18,6 +18,9 @@ Bordeaux Ynov M1 - Web Services (March 2022)
 ### Users
 
 - POST /users : Create a new user, sends an email to the user with a link to activate the account.
+- GET /users : Get the current user, needs authentication
+- PUT /users : Update the current user, needs authentication
+- DELETE /users : Delete the current user, needs authentication
 
 ### Tokens
 
