@@ -18,13 +18,16 @@ Bordeaux Ynov M1 - Web Services (March 2022)
 ### Users
 
 - POST /users : Create a new user, sends an email to the user with a link to activate the account.
-- POST /users/login : Login a user.
-- GET /users/logout : Logout a user. Need to be authenticated.
 
 ### Tokens
 
 - POST /tokens : Refresh access token
 - GET /tokens/:token : Verify user's email
+
+### Sessions
+
+- POST /sessions : Logs a user in.
+- GET /sessions : Logs a user out, needs to be authenticated
 
 ### Tasks
 

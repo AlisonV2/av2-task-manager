@@ -14,35 +14,6 @@ class UserController {
         .json({ message: err.message });
     }
   }
-
-  static async login(req, res) {
-    try {
-      const user = await UserService.login(req.body);
-      res.status(200).json({
-        message: 'User logged in successfully',
-        data: {
-          ...user,
-        },
-      });
-    } catch (err) {
-      res
-        .status(err.statusCode)
-        .json({ message: err.message });
-    }
-  }
-
-  static async logout(req, res) {
-    try {
-      await UserService.logout(req.user);
-      res.status(200).json({
-        message: 'User logged out successfully',
-      });
-    } catch (err) {
-      res
-        .status(err.statusCode)
-        .json({ message: err.message });
-    }
-  }
 }
 
 export default UserController;

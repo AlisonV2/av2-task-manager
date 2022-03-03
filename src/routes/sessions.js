@@ -1,14 +1,14 @@
 import express from 'express';
-import UserController from '../controllers/UserController';
+import SessionController from '../controllers/SessionController';
 import authenticate from '../middleware/authenticate';
 
 const router = express.Router();
 
 router
-    .post('/', UserController.login)
-    .get('/', authenticate, UserController.logout)
+    .post('/', SessionController.login)
+    .get('/', authenticate, SessionController.logout)
 
 export { router as sessionsRouter };
 
-// /authentication : login (post), logout (get)
-// /users : register, delete, update, verify
+// delete to logout?
+

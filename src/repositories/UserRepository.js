@@ -1,6 +1,15 @@
 import User from '../models/User';
 
 class UserRepository {
+  static formatUser(user) {
+    return {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+  }
+  
   static async getUser(query) {
     return User.findOne({ ...query });
   }
