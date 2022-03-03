@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import EmailService from '../src/services/EmailService';
+import EmailService from '../../src/services/EmailService';
 
 const sendMailMock = jest
   .fn()

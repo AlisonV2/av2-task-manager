@@ -1,6 +1,6 @@
 import SecurityService from '../services/SecurityService';
 
-const auth = async (req, res, next) => {
+const authenticate = async (req, res, next) => {
   try {
     const header = req.headers.authorization;
     const token = header.split(' ')[1];
@@ -20,4 +20,4 @@ const auth = async (req, res, next) => {
   }
 };
 
-export default auth;
+export default authenticate;

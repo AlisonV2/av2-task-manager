@@ -9,67 +9,46 @@ class UserController {
           'An email has been sent to your account. Please verify your email to complete registration.',
       });
     } catch (err) {
-      res
-        .status(err.statusCode)
-        .json({ message: err.message });
+      res.status(err.statusCode).json({ message: err.message });
     }
   }
 
-  static async login(req, res) {
+  static async updateUser(req, res) {
     try {
-      const user = await UserService.login(req.body);
+      const user = await UserService.updateUser(req.user, req.body);
       res.status(200).json({
-        message: 'User logged in successfully',
+        message: 'User updated successfully',
         data: {
           ...user,
         },
       });
     } catch (err) {
-      res
-        .status(err.statusCode)
-        .json({ message: err.message });
+      res.status(err.statusCode).json({ message: err.message });
     }
   }
 
-  static async logout(req, res) {
+  static async getUser(req, res) {
     try {
-      await UserService.logout(req.user);
+      const user = await UserService.getUser(req.user);
       res.status(200).json({
-        message: 'User logged out successfully',
-      });
-    } catch (err) {
-      res
-        .status(err.statusCode)
-        .json({ message: err.message });
-    }
-  }
-
-  static async refreshToken(req, res) {
-    try {
-      const accessToken = await UserService.refreshToken(req.body.refresh);
-      res.status(200).json({
-        message: 'Token refreshed successfully',
+        message: 'User retrieved successfully',
         data: {
-          access: accessToken,
+          ...user,
         },
       });
     } catch (err) {
-      res
-        .status(err.statusCode)
-        .json({ message: err.message });
+      res.status(err.statusCode).json({ message: err.message });
     }
   }
 
-  static async verifyEmail(req, res) {
+  static async deleteUser(req, res) {
     try {
-      await UserService.verifyEmail(req.params.token);
+      await UserService.deleteUser(req.user);
       res.status(200).json({
-        message: 'Email verified successfully',
+        message: 'User deleted successfully',
       });
     } catch (err) {
-      res
-        .status(err.statusCode)
-        .json({ message: err.message });
+      res.status(err.statusCode).json({ message: err.message });
     }
   }
 }
