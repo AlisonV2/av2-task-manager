@@ -1,18 +1,7 @@
-import TokenRepository from '../repositories/TokenRepository';
 import UserRepository from '../repositories/UserRepository';
 import SecurityService from './SecurityService';
 
 class TokenService {
-  static async getToken(token) {
-    const foundToken = await TokenRepository.getToken({ token })
-    if (!foundToken) {
-      const error = new Error('Invalid link');
-      error.statusCode = 404;
-      throw error;
-    }
-    return foundToken;
-  }
-
   static async refreshToken(refresh) {
     try {
       const user = await UserRepository.getUser({ token: refresh });

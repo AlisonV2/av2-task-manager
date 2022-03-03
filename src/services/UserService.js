@@ -39,6 +39,40 @@ class UserService {
       throw error;
     }
   }
+
+  static async updateUser(user, data) {
+    // check what fields can be updated
+    try {
+      const updatedUser = await UserRepository.updateUser({ ...user, ...data });
+      return UserRepository.formatUser(updatedUser);
+    } catch (err) {
+      const error = new Error('Error updating user');
+      error.statusCode = 400;
+    }
+  }
+
+  static async getUser(user) {
+    try {
+      const foundUser = await UserRepository.getUser({ _id: user.id });
+
+      return UserRepository.formatUser(foundUser);
+    } catch (err) {
+      const error = new Error('User not found');
+      error.statusCode = 404;
+      throw error;
+    }
+  }
+
+  static async deleteUser(user) {
+    try {
+      await UserRepository.deleteUser(user.id);
+      return 'User deleted successfully';
+    } catch (err) {
+      const error = new Error('Error deleting user');
+      error.statusCode = 400;
+      throw error;
+    }
+  }
 }
 
 export default UserService;

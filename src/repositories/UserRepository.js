@@ -20,6 +20,7 @@ class UserRepository {
   }
 
   static async updateUser(user) {
+    // check what fields can be updated
     const updatedUser = await this.getUser({ _id: user.id });
     Object.keys(user).forEach((key) => {
       updatedUser[key] = user[key];
@@ -31,6 +32,11 @@ class UserRepository {
     const user = await this.getUser({ _id: id });
     user.verified = true;
     return user.save();
+  }
+
+  static async deleteUser(id) {
+    const user = await this.getUser({ _id: id });
+    return user.remove();
   }
 }
 

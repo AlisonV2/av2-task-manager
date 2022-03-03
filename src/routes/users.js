@@ -6,7 +6,10 @@ const router = express.Router();
 
 router
     .post('/', UserController.register)
+    .put('/', authenticate, UserController.updateUser)
+    .get('/', authenticate, UserController.getUser)
+    .delete('/', authenticate, UserController.deleteUser)
+
 export { router as usersRouter };
 
-// /authentication : login (post), logout (get)
-// /users : register, delete, update, verify
+// Add reset password 
