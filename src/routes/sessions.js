@@ -5,8 +5,10 @@ import authenticate from '../middleware/authenticate';
 const router = express.Router();
 
 router
-    .post('/', UserController.register)
-export { router as usersRouter };
+    .post('/', UserController.login)
+    .get('/', authenticate, UserController.logout)
+
+export { router as sessionsRouter };
 
 // /authentication : login (post), logout (get)
 // /users : register, delete, update, verify

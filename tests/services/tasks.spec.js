@@ -1,6 +1,6 @@
-import { connect, disconnect, clear } from './fixtures/database';
-import TaskService from '../src/services/TaskService';
-import { createTask, createManyTasks } from './fixtures/tasks';
+import { connect, disconnect, clear } from '../fixtures/database';
+import TaskService from '../../src/services/TaskService';
+import { createTask, createManyTasks } from '../fixtures/tasks';
 
 beforeAll(async () => connect());
 beforeEach(async () => clear());

@@ -1,8 +1,8 @@
 import request from 'supertest';
-import app from './fixtures/app';
-import { connect, disconnect, clear } from './fixtures/database';
-import { createAccessToken } from './fixtures/users';
-import { createUserTask, createManyUserTasks } from './fixtures/tasks';
+import app from '../fixtures/app';
+import { connect, disconnect, clear } from '../fixtures/database';
+import { createAccessToken } from '../fixtures/users';
+import { createUserTask, createManyUserTasks } from '../fixtures/tasks';
 
 beforeAll(async () => connect());
 beforeEach(async () => clear());

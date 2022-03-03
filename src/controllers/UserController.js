@@ -43,35 +43,6 @@ class UserController {
         .json({ message: err.message });
     }
   }
-
-  static async refreshToken(req, res) {
-    try {
-      const accessToken = await UserService.refreshToken(req.body.refresh);
-      res.status(200).json({
-        message: 'Token refreshed successfully',
-        data: {
-          access: accessToken,
-        },
-      });
-    } catch (err) {
-      res
-        .status(err.statusCode)
-        .json({ message: err.message });
-    }
-  }
-
-  static async verifyEmail(req, res) {
-    try {
-      await UserService.verifyEmail(req.params.token);
-      res.status(200).json({
-        message: 'Email verified successfully',
-      });
-    } catch (err) {
-      res
-        .status(err.statusCode)
-        .json({ message: err.message });
-    }
-  }
 }
 
 export default UserController;

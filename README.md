@@ -20,8 +20,11 @@ Bordeaux Ynov M1 - Web Services (March 2022)
 - POST /users : Create a new user, sends an email to the user with a link to activate the account.
 - POST /users/login : Login a user.
 - GET /users/logout : Logout a user. Need to be authenticated.
-- GET /users/verify/:token : Verify a user account.
-- POST /users/refresh : Refresh a user token.
+
+### Tokens
+
+- POST /tokens : Refresh access token
+- GET /tokens/:token : Verify user's email
 
 ### Tasks
 
@@ -68,6 +71,10 @@ npm run test
 ```
 
 Coverage is found in /coverage folder. 
+
+## Logs
+
+
 
 ## Utilities
 
