@@ -1,22 +1,16 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-
 dotenv.config();
 
 class Database {
-  static async start(mode) {
-    let dbUrl;
-
-    if (mode === 'test') dbUrl = process.env.TEST_DB_URL;
-    else dbUrl = process.env.DB_URL;
-
+  static async start() {
     try {
-      await mongoose.connect(dbUrl, {
+      await mongoose.connect(process.env.DB_URL, {
         useNewUrlParser: true,
         useCreateIndex: true,
         useFindAndModify: false,
       });
-      console.log(`Database connected to Task Manager DB, mode: ${mode}`);
+      console.log('Database connected to Task Manager DB');
     } catch (err) {
       console.log(err);
     }

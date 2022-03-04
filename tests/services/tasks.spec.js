@@ -57,9 +57,7 @@ describe('Task Service', () => {
 
   test('Should return properly formatted task', async () => {
     const createdTask = await createTask();
-    const formattedTask = TaskService.formatTask(createdTask);
-
-    expect(formattedTask.id).toBe(createdTask._id);
+    expect(createdTask.id).toBeTruthy();
   });
 
   test('Should get all tasks', async () => {
@@ -81,6 +79,21 @@ describe('Task Service', () => {
 
     try {
       await TaskService.updateTask(user, id, task);
+    } catch (err) {
+      expect(err.message).toBe('Error updating task');
+      expect(err.statusCode).toBe(400);
+    }
+  });
+
+  test('Should throw error when updating task with invalid fields', async () => {
+    try {
+      const createdTask = await createTask();
+
+      await TaskService.updateTask(user, createdTask._id, {
+        id: 'test123456',
+        description: 'Updated Task Description',
+        status: 'completed',
+      });
     } catch (err) {
       expect(err.message).toBe('Error updating task');
       expect(err.statusCode).toBe(400);
