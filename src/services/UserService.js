@@ -35,13 +35,22 @@ class UserService {
       return await EmailService.sendMail(createdToken.token, newUser.email);
     } catch (err) {
       const error = new Error(err.message);
-      error.statusCode = err.statusCode;
+      error.statusCode = 400;
       throw error;
     }
   }
 
   static async updateUser(user, data) {
-    // check what fields can be updated
+    const updates = Object.keys(data)
+    const allowedUpdates = ['name', 'password']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+      const error = new Error('Invalid updates')
+      error.statusCode = 400
+      throw error;
+    }
+
     try {
       const updatedUser = await UserRepository.updateUser({ ...user, ...data });
       return UserRepository.formatUser(updatedUser);

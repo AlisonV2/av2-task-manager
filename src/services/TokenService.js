@@ -25,26 +25,22 @@ class TokenService {
   static async verifyEmail(token) {
     try {
       const tokenObject = await SecurityService.getToken(token);
+      console.log(tokenObject)
       const decoded = SecurityService.verifyUserToken(tokenObject, token);
+      console.log(decoded)
 
       const user = await UserRepository.getUser({
         _id: decoded.id,
         email: decoded.email,
       });
 
-      if (!user) {
-        const error = new Error('No user found');
-        error.statusCode = 404;
-        throw error;
-      }
-
       await UserRepository.verifyUser(user._id);
       await SecurityService.deleteToken(token);
 
       return 'Email verified';
     } catch (err) {
-      const error = new Error(err.message);
-      error.statusCode = err.statusCode;
+      const error = new Error('Invalid link');
+      error.statusCode = 404;
       throw error;
     }
   }

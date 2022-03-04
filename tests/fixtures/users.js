@@ -15,6 +15,19 @@ const createUser = async () => {
   return newUser.save();
 };
 
+const createUnverifiedUser = async () => {
+  const hashed = await SecurityService.hashPassword('test123456');
+
+  const newUser = new User({
+    email: 'user2@test.com',
+    name: 'User2',
+    password: hashed,
+    verified: false,
+  });
+
+  return newUser.save();
+};
+
 const createAccessToken = async () => {
   const user = await createUser();
   const token = SecurityService.generateAccessToken({
@@ -27,7 +40,7 @@ const createAccessToken = async () => {
 
 const deleteUser = async (id) => {
   return User.findByIdAndDelete(id);
-}
+};
 
 const createUserToken = async () => {
   const user = await createUser();
@@ -39,11 +52,16 @@ const createUserToken = async () => {
   const newToken = new Token({
     user: user._id.toString(),
     token,
-    email: user.email
+    email: user.email,
   });
 
   return newToken.save();
-}
+};
 
-
-export { createUser, createAccessToken, deleteUser, createUserToken };
+export {
+  createUser,
+  createAccessToken,
+  deleteUser,
+  createUserToken,
+  createUnverifiedUser,
+};

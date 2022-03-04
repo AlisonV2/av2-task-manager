@@ -28,9 +28,8 @@ describe('Email Service', () => {
   });
 
   test('Should throw an error when failing to send email', async () => {
-    const token = 'test';
     try {
-      await EmailService.sendMail(token);
+      await EmailService.sendMail();
     } catch (err) {
       expect(err.message).toBe('Email is required');
     }

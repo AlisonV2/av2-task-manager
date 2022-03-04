@@ -1,6 +1,6 @@
 import { connect, disconnect, clear } from '../fixtures/database';
 import SessionService from '../../src/services/SessionService';
-import { createUser } from '../fixtures/users';
+import { createUser, createUnverifiedUser } from '../fixtures/users';
 
 beforeAll(async () => connect());
 beforeEach(async () => clear());
@@ -11,6 +11,13 @@ const user = {
   name: 'User2',
   password: 'test123456',
   verified: true,
+};
+
+const user2 = {
+  email: 'user2@test.com',
+  name: 'User2',
+  password: 'test123456',
+  verified: false,
 };
 
 describe('User Service', () => {
@@ -80,4 +87,17 @@ describe('User Service', () => {
       expect(err.statusCode).toBe(404);
     }
   });
+
+  test('Should throw an error if user is not verified', async () => {
+    try {
+      await createUnverifiedUser();
+      await SessionService.login({
+        email: user2.email,
+        password: user2.password,
+      });
+    } catch (err) {
+      expect(err.message).toBe('User not verified');
+      expect(err.statusCode).toBe(400);
+    }
+  })
 });

@@ -85,6 +85,21 @@ describe('Task Service', () => {
     }
   });
 
+  test('Should throw error when updating task with invalid fields', async () => {
+    try {
+      const createdTask = await createTask();
+
+      await TaskService.updateTask(user, createdTask._id, {
+        id: 'test123456',
+        description: 'Updated Task Description',
+        status: 'completed',
+      });
+    } catch (err) {
+      expect(err.message).toBe('Error updating task');
+      expect(err.statusCode).toBe(400);
+    }
+  });
+
   test('Should throw error when getting task that does not exist', async () => {
     const id = '5f0b8b9f9d7d3b3d3c7f2f0f';
 

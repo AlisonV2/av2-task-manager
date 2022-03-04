@@ -64,6 +64,20 @@ describe('Users routes', () => {
     expect(response.body.data.name).toBe('UpdatedUser');
   });
 
+  test('Should throw an error when fields are invalid', async () => {
+    const { token } = await createAccessToken();
+
+    const response = await request(app)
+      .put('/api/users')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        id: 'user123456',
+      })
+      .expect(400);
+
+    expect(response.body.message).toBe('Invalid updates');
+  });
+
   test('Should delete a user', async () => {
     const { token } = await createAccessToken();
     const response = await request(app)
