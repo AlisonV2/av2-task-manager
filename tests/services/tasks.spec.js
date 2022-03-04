@@ -95,7 +95,7 @@ describe('Task Service', () => {
         status: 'completed',
       });
     } catch (err) {
-      expect(err.message).toBe('Error updating task');
+      expect(err.message).toBe('Invalid updates');
       expect(err.statusCode).toBe(400);
     }
   });

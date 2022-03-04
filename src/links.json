@@ -1,0 +1,38 @@
+{
+  "/api/tasks": {
+    "rel": "tasks",
+    "methods": ["POST", "GET"],
+    "href": "/api/tasks"
+  },
+  "/api/tasks/:id": {
+    "description": "Get a task",
+    "rel": "tasks",
+    "methods": ["GET", "PUT", "DELETE"],
+    "href": "/api/tasks/:id"
+  },
+  "/api/users": {
+    "rel": "users",
+    "methods": ["POST"],
+    "href": "/api/users"
+  },
+  "/api/users/current": {
+    "rel": "users",
+    "methods": ["GET", "PUT", "DELETE"],
+    "href": "/api/users/current"
+  },
+  "/api/sessions": {
+    "rel": "sessions",
+    "methods": ["POST", "DELETE"],
+    "href": "/api/sessions"
+  },
+  "/api/tokens": {
+    "rel": "tokens",
+    "methods": ["POST"],
+    "href": "/api/tokens"
+  },
+  "/api/tokens/:token": {
+    "rel": "tokens",
+    "methods": ["GET"],
+    "href": "/api/tokens/:token"
+  }
+}
