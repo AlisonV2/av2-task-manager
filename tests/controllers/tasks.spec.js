@@ -116,8 +116,8 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.length).toBe(tasks.length);
-    expect(response.body[0].title).toBe(tasks[0].title);
+    expect(response.body.tasks.length).toBe(tasks.length);
+    expect(response.body.tasks[0].title).toBe(tasks[0].title);
   });
 
   test('Should get all completed tasks', async () => {
@@ -129,7 +129,7 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.length).toBe(2);
+    expect(response.body.tasks.length).toBe(2);
   })
 
   test('Should get all pending tasks by ASC order', async () => {
@@ -141,8 +141,8 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.length).toBe(2);
-    expect(response.body[0].title).toBe('B - New task');
+    expect(response.body.tasks.length).toBe(2);
+    expect(response.body.tasks[0].title).toBe('B - New task');
   })
 
   test('Should get all pending tasks by DESC order', async () => {
@@ -154,8 +154,8 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.length).toBe(2);
-    expect(response.body[0].title).toBe('D - New task');
+    expect(response.body.tasks.length).toBe(2);
+    expect(response.body.tasks[0].title).toBe('D - New task');
   })
 
   test('Should return the first 3 tasks', async () => {
@@ -167,8 +167,8 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.length).toBe(3);
-    expect(response.body[0].title).toBe('A - New task');
+    expect(response.body.tasks.length).toBe(3);
+    expect(response.body.tasks[0].title).toBe('A - New task');
   })
 
   test('Should return the next 3 tasks', async () => {
@@ -180,8 +180,8 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.length).toBe(3);
-    expect(response.body[0].title).toBe('D - New task');
+    expect(response.body.tasks.length).toBe(3);
+    expect(response.body.tasks[0].title).toBe('D - New task');
   })
 
   test('Should throw an error when no tasks found', async () => {

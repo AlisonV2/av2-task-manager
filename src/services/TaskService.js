@@ -20,6 +20,16 @@ class TaskService {
   }
 
   static async updateTask(user, id, task) {
+    const updates = Object.keys(task)
+    const allowedUpdates = ['title', 'description', 'status']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+      const error = new Error('Invalid updates')
+      error.statusCode = 400
+      throw error;
+    }
+    
     try {
       const query = { _id: id, user: user.id };
       const updatedTask = await TaskRepository.updateTask(query, task);
