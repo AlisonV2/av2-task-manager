@@ -6,7 +6,7 @@ const router = express.Router();
 
 router
     .post('/', SessionController.login)
-    .get('/', authenticate, SessionController.logout)
+    .delete('/', authenticate, SessionController.logout)
 
 export { router as sessionsRouter };
 

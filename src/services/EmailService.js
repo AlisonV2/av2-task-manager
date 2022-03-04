@@ -18,7 +18,7 @@ class EmailService {
 
   static async sendMail(token, email) {
     const transporter = this.createTransporter();
-    const url = `${process.env.BASE_URL}/api/users/verify/${token}`;
+    const url = `${process.env.BASE_URL}/api/tokens/${token}`;
     
     await transporter.sendMail({
       from: process.env.SMTP_USER,

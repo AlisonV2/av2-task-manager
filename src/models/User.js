@@ -32,10 +32,6 @@ const User = Database.createModel('User', {
     type: Boolean,
     default: false,
   },
-  avatar: {
-    type: String,
-    default: null,
-  }
 });
 
 export default User;
