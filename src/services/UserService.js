@@ -1,6 +1,7 @@
 import SecurityService from './SecurityService';
 import EmailService from './EmailService';
 import UserRepository from '../repositories/UserRepository';
+import TaskRepository from '../repositories/TaskRepository';
 
 class UserService {
   static async createUser(user) {
@@ -39,10 +40,10 @@ class UserService {
       throw error;
     }
   }
-
+  
   static async updateUser(user, data) {
     const updates = Object.keys(data)
-    const allowedUpdates = ['name', 'password']
+    const allowedUpdates = ['name'];
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
@@ -75,6 +76,7 @@ class UserService {
   static async deleteUser(user) {
     try {
       await UserRepository.deleteUser(user.id);
+      await TaskRepository.deleteUserTasks(user.id);
       return 'User deleted successfully';
     } catch (err) {
       const error = new Error('Error deleting user');

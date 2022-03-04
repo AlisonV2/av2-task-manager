@@ -25,9 +25,7 @@ class TokenService {
   static async verifyEmail(token) {
     try {
       const tokenObject = await SecurityService.getToken(token);
-      console.log(tokenObject)
       const decoded = SecurityService.verifyUserToken(tokenObject, token);
-      console.log(decoded)
 
       const user = await UserRepository.getUser({
         _id: decoded.id,

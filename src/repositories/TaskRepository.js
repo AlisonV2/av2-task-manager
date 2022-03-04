@@ -43,6 +43,10 @@ class TaskRepository {
     .skip(skip)
     .limit(limit);
   }
+
+  static async deleteUserTasks(id) {
+    return Task.deleteMany({ user: id });
+  }
 }
 
 export default TaskRepository;
