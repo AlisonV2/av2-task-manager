@@ -20,7 +20,7 @@ class SessionService {
       throw error;
     }
 
-    if (foundUser.verified === false) {
+    if (!foundUser.verified) {
       const error = new Error('User not verified');
       error.statusCode = 400;
       throw error;

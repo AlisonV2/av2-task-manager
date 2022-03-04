@@ -6,9 +6,9 @@ const router = express.Router();
 
 router
     .post('/', UserController.register)
-    .put('/', authenticate, UserController.updateUser)
-    .get('/', authenticate, UserController.getUser)
-    .delete('/', authenticate, UserController.deleteUser)
+    .put('/current', authenticate, UserController.updateUser)
+    .get('/current', authenticate, UserController.getUser)
+    .delete('/current', authenticate, UserController.deleteUser)
 
 export { router as usersRouter };
 

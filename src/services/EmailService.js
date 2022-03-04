@@ -17,24 +17,18 @@ class EmailService {
   }
 
   static async sendMail(token, email) {
-    try {
-      const transporter = this.createTransporter();
-      const url = `${process.env.BASE_URL}/api/users/verify/${token}`;
-      await transporter.sendMail({
-        from: process.env.SMTP_USER,
-        to: email,
-        subject: 'Account confirmation',
-        text: 'Please confirm your account by clicking the link:',
-        html: `<a href="${url}" target="_blank">Verify email</a>`,
-      });
+    const transporter = this.createTransporter();
+    const url = `${process.env.BASE_URL}/api/tokens/${token}`;
+    
+    await transporter.sendMail({
+      from: process.env.SMTP_USER,
+      to: email,
+      subject: 'Account confirmation',
+      text: 'Please confirm your account by clicking the link:',
+      html: `<a href="${url}" target="_blank">Verify email</a>`,
+    });
 
-      return `Message sent to: ${email}`;
-    } catch (err) {
-      console.log(err.message);
-      const error = new Error(err.message);
-      error.statusCode = 500;
-      throw error;
-    }
+    return `Message sent to: ${email}`;
   }
 }
 

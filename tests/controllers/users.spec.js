@@ -22,7 +22,7 @@ afterAll(async () => disconnect());
 
 describe('Users routes', () => {
   test('Should return newly created user', async () => {
-    const response = await request(app)
+    await request(app)
       .post('/api/users')
       .send({
         email: 'user2@test.com',
@@ -30,10 +30,6 @@ describe('Users routes', () => {
         password: 'test123456',
       })
       .expect(201);
-
-    expect(response.body.message).toBe(
-      'An email has been sent to your account. Please verify your email to complete registration.'
-    );
   });
 
   test('Should return an error if user already exist', async () => {
@@ -47,55 +43,67 @@ describe('Users routes', () => {
       })
       .expect(400);
 
-    expect(response.body.message).toBe('User already exists');
+    expect(response.body).toBe('User already exists');
   });
 
   test('Should update an existing user', async () => {
     const { token } = await createAccessToken();
 
     const response = await request(app)
-      .put('/api/users')
+      .put('/api/users/current')
       .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'UpdatedUser',
       })
       .expect(200);
 
-    expect(response.body.data.name).toBe('UpdatedUser');
+    expect(response.body.name).toBe('UpdatedUser');
+  });
+
+  test('Should throw an error when fields are invalid', async () => {
+    const { token } = await createAccessToken();
+
+    const response = await request(app)
+      .put('/api/users/current')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        id: 'user123456',
+      })
+      .expect(400);
+
+    expect(response.body).toBe('Invalid updates');
   });
 
   test('Should delete a user', async () => {
     const { token } = await createAccessToken();
-    const response = await request(app)
-        .delete('/api/users')
+    await request(app)
+        .delete('/api/users/current')
         .set('Authorization', `Bearer ${token}`)
-        .expect(200);
-    
-    expect(response.body.message).toBe('User deleted successfully');
+        .expect(204);
     }
   );
 
   test('Should get a specific user', async () => {
     const { user, token } = await createAccessToken();
     const response = await request(app)
-      .get('/api/users')
+      .get('/api/users/current')
       .set('Authorization', `Bearer ${token}`)
       .send()
       .expect(200);
 
-    expect(response.body.data.name).toBe(user.name);
+    expect(response.body.name).toBe(user.name);
   })
 
   test('Should throw an error if the user does not exist', async () => {
     const { user, token } = await createAccessToken();
     await deleteUser(user._id)
     const response = await request(app)
-      .get('/api/users')
+      .get('/api/users/current')
       .set('Authorization', `Bearer ${token}`)
       .send()
       .expect(404);
 
-    expect(response.body.message).toBe('User not found');
+    expect(response.body).toBe('User not found');
   })
 
   test('Should throw an error if deleting user fails', async () => {
@@ -103,11 +111,11 @@ describe('Users routes', () => {
     await deleteUser(user._id)
     const response = await request(app)
 
-      .delete('/api/users')
+      .delete('/api/users/current')
       .set('Authorization', `Bearer ${token}`)
       .expect(400);
 
-    expect(response.body.message).toBe('Error deleting user');
+    expect(response.body).toBe('Error deleting user');
   })
 
 });

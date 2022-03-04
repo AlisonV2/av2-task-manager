@@ -18,8 +18,8 @@ describe('Session routes', () => {
       })
       .expect(200);
 
-    expect(response.body.data.user).toBe('User1');
-    expect(response.body.data.access).toBeTruthy();
+    expect(response.body.user).toBe('User1');
+    expect(response.body.access).toBeTruthy();
   });
 
   test('Should return an error if user not found', async () => {
@@ -31,24 +31,25 @@ describe('Session routes', () => {
       })
       .expect(404);
 
-    expect(response.body.message).toBe('User not found');
+    expect(response.body).toBe('User not found');
   });
 
   test('Should log user out', async () => {
     const { token } = await createAccessToken();
-    const response = await request(app)
-      .get('/api/sessions')
+    await request(app)
+      .delete('/api/sessions')
       .set('Authorization', `Bearer ${token}`)
       .send()
-      .expect(200);
-
-    expect(response.body.message).toBe('User logged out successfully');
+      .expect(204);
   });
 
   test('Should throw an error if no authorization token is provided', async () => {
-    const response = await request(app).get('/api/sessions').send().expect(401);
+    const response = await request(app)
+      .delete('/api/sessions')
+      .send()
+      .expect(401);
 
-    expect(response.body.message).toBe('Not authorized');
+    expect(response.body).toBe('Not authorized');
   });
 
   test('Should throw an error if no user is found', async () => {
@@ -56,11 +57,11 @@ describe('Session routes', () => {
     await deleteUser(user._id);
 
     const response = await request(app)
-      .get('/api/sessions')
+      .delete('/api/sessions')
       .set('Authorization', `Bearer ${token}`)
       .send()
       .expect(404);
 
-    expect(response.body.message).toBe('User not found');
+    expect(response.body).toBe('User not found');
   });
 });

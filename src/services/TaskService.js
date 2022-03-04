@@ -1,14 +1,6 @@
 import TaskRepository from '../repositories/TaskRepository';
 
 class TaskService {
-  static formatTask(task) {
-    return {
-      id: task._id,
-      title: task.title,
-      description: task.description,
-      status: task.status,
-    };
-  }
   static async createTask(user, task) {
     try {
       const newTask = {
@@ -19,7 +11,7 @@ class TaskService {
       };
 
       const createdTask = await TaskRepository.createTask(newTask);
-      return this.formatTask(createdTask);
+      return TaskRepository.formatTask(createdTask);
     } catch (err) {
       const error = new Error('Error creating task');
       error.statusCode = 400;
@@ -28,12 +20,21 @@ class TaskService {
   }
 
   static async updateTask(user, id, task) {
-    // check what fields can be updated
+    const updates = Object.keys(task)
+    const allowedUpdates = ['title', 'description', 'status']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+      const error = new Error('Invalid updates')
+      error.statusCode = 400
+      throw error;
+    }
+    
     try {
       const query = { _id: id, user: user.id };
       const updatedTask = await TaskRepository.updateTask(query, task);
 
-      return this.formatTask(updatedTask);
+      return TaskRepository.formatTask(updatedTask);
     } catch (err) {
       const error = new Error('Error updating task');
       error.statusCode = 400;
@@ -46,7 +47,7 @@ class TaskService {
       const query = { _id: id, user: user.id };
       const task = await TaskRepository.getTask(query);
 
-      return this.formatTask(task);
+      return TaskRepository.formatTask(task);
     } catch (err) {
       const error = new Error('Task not found');
       error.statusCode = 404;
@@ -66,7 +67,6 @@ class TaskService {
       throw error;
     }
   }
-  // status: 'pending' | 'completed' | 'in-progress'
 
   static async getTasks(user, filters) {
     try {
@@ -100,7 +100,7 @@ class TaskService {
 
       let formattedTasks = [];
       for (let i in tasks) {
-        formattedTasks.push(this.formatTask(tasks[i]));
+        formattedTasks.push(TaskRepository.formatTask(tasks[i]));
       }
       return formattedTasks;
     } catch (err) {

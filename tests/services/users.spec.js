@@ -63,6 +63,21 @@ describe('User Service', () => {
     }
   });
 
+  test('Should return an error if the updated field is not valid', async () => {
+    try {
+      const createdUser = await createUser();
+      await UserService.updateUser(
+        { id: createdUser._id },
+        {
+          id: 'user123456',
+        }
+      );
+    } catch (err) {
+      expect(err.message).toBe('Invalid updates');
+      expect(err.statusCode).toBe(400);
+    }
+  });
+
   test('Should get a user', async () => {
     const createdUser = await createUser();
     const foundUser = await UserService.getUser({ id: createdUser._id });

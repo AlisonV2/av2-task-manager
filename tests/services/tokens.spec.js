@@ -2,6 +2,7 @@ import { connect, disconnect, clear } from '../fixtures/database';
 import TokenService from '../../src/services/TokenService';
 import SessionService from '../../src/services/SessionService';
 import { createUser } from '../fixtures/users';
+import { createToken } from '../fixtures/security';
 
 beforeAll(async () => connect());
 beforeEach(async () => clear());
@@ -29,4 +30,14 @@ describe('Token Service', () => {
       expect(err.statusCode).toBe(401);
     }
   });
+
+  test('Should throw an error when no user found', async () => {
+    try {
+      const { token } = await createToken();
+      await TokenService.verifyEmail(token);
+    } catch (err) {
+      expect(err.message).toBe('Invalid link');
+      expect(err.statusCode).toBe(404);
+    }
+  })
 });

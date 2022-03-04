@@ -20,8 +20,7 @@ describe('Task routes', () => {
       })
       .expect(201);
 
-    expect(response.body.message).toBe('Task created successfully');
-    expect(response.body.data).not.toBeNull();
+    expect(response.body.id).not.toBeNull();
   });
 
   test('Should return an error when data is invalid', async () => {
@@ -34,7 +33,7 @@ describe('Task routes', () => {
       })
       .expect(400);
 
-    expect(response.body.message).toBe('Error creating task');
+    expect(response.body).toBe('Error creating task');
   });
 
   test('Should get task by id', async () => {
@@ -44,7 +43,7 @@ describe('Task routes', () => {
       .get(`/api/tasks/${task._id}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
-    expect(response.body.data.title).toBe(task.title);
+    expect(response.body.title).toBe(task.title);
   });
 
   test('Should throw an error when task not found', async () => {
@@ -53,7 +52,7 @@ describe('Task routes', () => {
       .get('/api/tasks/1213')
       .set('Authorization', `Bearer ${token}`)
       .expect(404);
-      expect(response.body.message).toBe('Task not found');
+      expect(response.body).toBe('Task not found');
   });
 
   test('Should update a task', async () => {
@@ -68,8 +67,7 @@ describe('Task routes', () => {
       })
       .expect(200);
 
-    expect(response.body.message).toBe('Task updated successfully');
-    expect(response.body.data.title).toBe('Updated task');
+    expect(response.body.title).toBe('Updated task');
   });
 
   test('Should throw an error when failing to update task', async () => {
@@ -84,19 +82,17 @@ describe('Task routes', () => {
       })
       .expect(400);
 
-    expect(response.body.message).toBe('Error updating task');
+    expect(response.body).toBe('Error updating task');
   });
 
   test('Should delete a task', async () => {
     const { user, token } = await createAccessToken();
     const task = await createUserTask(user._id);
 
-    const response = await request(app)
+    await request(app)
       .delete(`/api/tasks/${task._id}`)
       .set('Authorization', `Bearer ${token}`)
-      .expect(200);
-
-    expect(response.body.message).toBe('Task deleted successfully');
+      .expect(204);
   });
 
   test('Should throw an error when deleting a task failed', async () => {
@@ -108,7 +104,7 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(404);
 
-      expect(response.body.message).toBe('Task not found');
+      expect(response.body).toBe('Task not found');
   });
 
   test('Should get all tasks', async () => {
@@ -120,8 +116,8 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.data.length).toBe(tasks.length);
-    expect(response.body.data[0].title).toBe(tasks[0].title);
+    expect(response.body.tasks.length).toBe(tasks.length);
+    expect(response.body.tasks[0].title).toBe(tasks[0].title);
   });
 
   test('Should get all completed tasks', async () => {
@@ -133,7 +129,7 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.data.length).toBe(2);
+    expect(response.body.tasks.length).toBe(2);
   })
 
   test('Should get all pending tasks by ASC order', async () => {
@@ -145,8 +141,8 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.data.length).toBe(2);
-    expect(response.body.data[0].title).toBe('B - New task');
+    expect(response.body.tasks.length).toBe(2);
+    expect(response.body.tasks[0].title).toBe('B - New task');
   })
 
   test('Should get all pending tasks by DESC order', async () => {
@@ -158,8 +154,8 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.data.length).toBe(2);
-    expect(response.body.data[0].title).toBe('D - New task');
+    expect(response.body.tasks.length).toBe(2);
+    expect(response.body.tasks[0].title).toBe('D - New task');
   })
 
   test('Should return the first 3 tasks', async () => {
@@ -171,8 +167,8 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.data.length).toBe(3);
-    expect(response.body.data[0].title).toBe('A - New task');
+    expect(response.body.tasks.length).toBe(3);
+    expect(response.body.tasks[0].title).toBe('A - New task');
   })
 
   test('Should return the next 3 tasks', async () => {
@@ -184,8 +180,8 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.data.length).toBe(3);
-    expect(response.body.data[0].title).toBe('D - New task');
+    expect(response.body.tasks.length).toBe(3);
+    expect(response.body.tasks[0].title).toBe('D - New task');
   })
 
   test('Should throw an error when no tasks found', async () => {
@@ -197,7 +193,7 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(404);
 
-    expect(response.body.message).toBe('No tasks found');
+    expect(response.body).toBe('No tasks found');
   });
 
   test('Should throw an error when token is invalid', async () => {
@@ -206,6 +202,6 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer invalid-token`)
       .expect(401);
 
-      expect(response.body.message).toBe('Not authorized');
+      expect(response.body).toBe('Not authorized');
   });
 });

@@ -1,50 +1,47 @@
 import TaskService from '../services/TaskService';
+import LinksGenerator from '../helpers/LinksGenerator';
 
 class TaskController {
   static async createTask(req, res) {
     try {
       const newTask = await TaskService.createTask(req.user, req.body);
-      res
-        .status(201)
-        .json({ message: 'Task created successfully', data: newTask._id });
+      const links = LinksGenerator.generateLinks('singleTask', newTask.id);
+      res.status(201).json({...newTask, links });
     } catch (err) {
-      res.status(err.statusCode).json({ message: err.message });
+      res.status(err.statusCode).json(err.message);
     }
   }
 
   static async updateTask(req, res) {
     try {
-      // add req.user
       const updatedTask = await TaskService.updateTask(
         req.user,
         req.params.id,
         req.body
       );
-      res
-        .status(200)
-        .json({ message: 'Task updated successfully', data: updatedTask });
+      const links = LinksGenerator.generateLinks('singleTask', req.params.id);
+      res.status(200).json({...updatedTask, links});
     } catch (err) {
-      res.status(err.statusCode).json({ message: err.message });
+      res.status(err.statusCode).json(err.message);
     }
   }
 
   static async getTaskById(req, res) {
     try {
       const task = await TaskService.getTaskById(req.user, req.params.id);
-      res.status(200).json({ data: task });
+      const links = LinksGenerator.generateLinks('singleTask', req.params.id);
+      res.status(200).json({...task, links});
     } catch (err) {
-      res.status(err.statusCode).json({ message: err.message });
+      res.status(err.statusCode).json(err.message);
     }
   }
 
   static async deleteTask(req, res) {
     try {
-      const deletedTask = await TaskService.deleteTask(req.user, req.params.id);
-      res.status(200).json({ message: deletedTask });
+      await TaskService.deleteTask(req.user, req.params.id);
+      res.status(204).send();
     } catch (err) {
-      res.status(err.statusCode).json({
-        message: err.message,
-      });
+      res.status(err.statusCode).json(err.message);
     }
   }
 
@@ -52,11 +49,10 @@ class TaskController {
     try {
       const filters = req.query;
       const tasks = await TaskService.getTasks(req.user, filters);
-      res.status(200).json({ data: tasks });
+      const links = LinksGenerator.generateLinks('allTasks');
+      res.status(200).json({tasks, links});
     } catch (err) {
-      res.status(err.statusCode).json({
-        message: err.message,
-      });
+      res.status(err.statusCode).json(err.message);
     }
   }
 }
