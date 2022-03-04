@@ -5,24 +5,19 @@ class TokenController {
     try {
       const accessToken = await TokenService.refreshToken(req.body.refresh);
       res.status(200).json({
-        message: 'Token refreshed successfully',
-        data: {
-          access: accessToken,
-        },
+        access: accessToken
       });
     } catch (err) {
-      res.status(err.statusCode).json({ message: err.message });
+      res.status(err.statusCode).json(err.message);
     }
   }
 
   static async verifyEmail(req, res) {
     try {
       await TokenService.verifyEmail(req.params.token);
-      res.status(200).json({
-        message: 'Email verified successfully',
-      });
+      res.status(200).send();
     } catch (err) {
-      res.status(err.statusCode).json({ message: err.message });
+      res.status(err.statusCode).json(err.message);
     }
   }
 }
