@@ -18,9 +18,9 @@ Bordeaux Ynov M1 - Web Services (March 2022)
 ### Users
 
 - POST /users : Create a new user, sends an email to the user with a link to activate the account.
-- GET /users : Get the current user, needs authentication
-- PUT /users : Update the current user, needs authentication
-- DELETE /users : Delete the current user, needs authentication
+- GET /users/current : Get the current user, needs authentication
+- PUT /users/current : Update the current user, needs authentication
+- DELETE /users/current : Delete the current user, needs authentication
 
 ### Tokens
 
@@ -30,7 +30,7 @@ Bordeaux Ynov M1 - Web Services (March 2022)
 ### Sessions
 
 - POST /sessions : Logs a user in.
-- GET /sessions : Logs a user out, needs to be authenticated
+- DELETE /sessions : Logs a user out, needs to be authenticated
 
 ### Tasks
 
