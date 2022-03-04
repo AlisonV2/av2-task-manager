@@ -41,10 +41,10 @@ Authentication is provided through HTTP Header Authorization, in the following f
 'Bearer <access_token>'
 
 - POST /tasks : Create a new task
-- GET /tasks : Get all tasks
-- GET /tasks/:id : Get a task by id
-- PUT /tasks/:id : Update a task by id
-- DELETE /tasks/:id : Delete a task by id
+- GET /tasks : Get all tasks for current user
+- GET /tasks/:id : Get a task by id for current user
+- PUT /tasks/:id : Update a task by id for current user
+- DELETE /tasks/:id : Delete a task by id for current user
 
 ## Documentation
 
