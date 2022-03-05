@@ -67,7 +67,14 @@ class SessionService {
 
   static async logout(user) {
     try {
-      await this.getUserById(user.id);
+      const foundUser = await this.getUserById(user.id);
+
+      if (!foundUser.token) {
+        const error = new Error('User not logged in');
+        error.statusCode = 401;
+        throw error;
+      }
+      
       await UserRepository.updateUser({
         ...user,
         token: null,

@@ -38,6 +38,15 @@ class UserController {
       res.status(err.statusCode).json(err.message);
     }
   }
+
+  static async getAllUsers(req, res) {
+    try {
+      const users = await UserService.getAllUsers(req.user);
+      res.status(200).json(users);
+    } catch (err) {
+      res.status(err.statusCode).json(err.message);
+    }
+  }
 }
 
 export default UserController;

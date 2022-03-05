@@ -7,6 +7,7 @@ class TaskRepository {
       title: task.title,
       description: task.description,
       status: task.status,
+      time: task.time
     };
   }
   
@@ -26,7 +27,8 @@ class TaskRepository {
     const updatedTask = await this.getTask(query);
 
     Object.keys(task).forEach((key) => {
-      updatedTask[key] = task[key];
+      if (key === 'time') updatedTask[key] += task[key];
+      else updatedTask[key] = task[key];
     });
 
     return updatedTask.save();

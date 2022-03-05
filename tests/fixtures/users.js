@@ -15,6 +15,18 @@ const createUser = async () => {
   return newUser.save();
 };
 
+const createAdmin = async () => {
+  const hashed = await SecurityService.hashPassword('test123456');
+  const newUser = new User({
+    email: 'admin1@test.com',
+    name: 'Admin1',
+    password: hashed,
+    verified: true,
+    role: 'admin',
+  });
+  return newUser.save();
+};
+
 const createUnverifiedUser = async () => {
   const hashed = await SecurityService.hashPassword('test123456');
 
@@ -30,6 +42,16 @@ const createUnverifiedUser = async () => {
 
 const createAccessToken = async () => {
   const user = await createUser();
+  const token = SecurityService.generateAccessToken({
+    ...user,
+    id: user._id.toString(),
+  });
+
+  return { user, token };
+};
+
+const createAdminToken = async () => {
+  const user = await createAdmin();
   const token = SecurityService.generateAccessToken({
     ...user,
     id: user._id.toString(),
@@ -58,10 +80,30 @@ const createUserToken = async () => {
   return newToken.save();
 };
 
+const createLoggedUser = async () => {
+  const user = await createUser();
+  const refreshToken = SecurityService.generateRefreshToken({
+    ...user,
+    id: user._id.toString(),
+  });
+  const accessToken = SecurityService.generateAccessToken({
+    ...user,
+    id: user._id.toString(),
+  });
+
+  user.token = refreshToken;
+  const updatedUser = await user.save();
+
+  return { updatedUser, accessToken };
+};
+
 export {
   createUser,
   createAccessToken,
   deleteUser,
   createUserToken,
   createUnverifiedUser,
+  createAdmin,
+  createAdminToken,
+  createLoggedUser,
 };

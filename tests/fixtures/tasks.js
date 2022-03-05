@@ -66,6 +66,18 @@ const createManyTasks = async () => {
   return Task.insertMany(tasks);
 };
 
+const createAdminTasks = async () => {
+  const tasks = [
+    { ...task1, user: '5f0b8sdfd7d3b3d3c7f2f0f' },
+    { ...task2, user: '5f0b8sdfd7d3b3d3c7f2f0f' },
+    task3,
+    task4,
+    task5,
+    task6,
+  ];
+  return Task.insertMany(tasks);
+};
+
 const createManyUserTasks = async (id) => {
   const tasks = [
     {
@@ -97,4 +109,4 @@ const createManyUserTasks = async (id) => {
   return Task.insertMany(tasks);
 };
 
-export { createTask, createManyTasks, createUserTask, createManyUserTasks };
+export { createTask, createManyTasks, createUserTask, createManyUserTasks, createAdminTasks };
