@@ -28,7 +28,7 @@ class TaskService {
 
     if (!isValidOperation) {
       const error = new Error('Invalid updates');
-      error.statusCode = 400;
+      error.statusCode = 409;
       throw error;
     }
 
@@ -37,7 +37,7 @@ class TaskService {
 
       if (task.status === 'completed' && !task.time) {
         const error = new Error('Logging time is required to complete a task');
-        error.statusCode = 400;
+        error.statusCode = 409;
         throw error;
       }
 

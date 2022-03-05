@@ -119,7 +119,7 @@ describe('Task Service', () => {
       });
     } catch (err) {
       expect(err.message).toBe('Invalid updates');
-      expect(err.statusCode).toBe(400);
+      expect(err.statusCode).toBe(409);
     }
   });
 

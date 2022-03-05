@@ -36,7 +36,7 @@ describe('User Service', () => {
       });
     } catch (err) {
       expect(err.message).toBe('Missing required fields');
-      expect(err.statusCode).toBe(400);
+      expect(err.statusCode).toBe(409);
     }
   });
 
@@ -74,7 +74,7 @@ describe('User Service', () => {
       );
     } catch (err) {
       expect(err.message).toBe('Invalid updates');
-      expect(err.statusCode).toBe(400);
+      expect(err.statusCode).toBe(409);
     }
   });
 

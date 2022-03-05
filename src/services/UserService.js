@@ -15,7 +15,7 @@ class UserService {
 
     if (!user.name || !user.email || !user.password) {
       const error = new Error('Missing required fields');
-      error.statusCode = 400;
+      error.statusCode = 409;
       throw error;
     }
 
@@ -50,7 +50,7 @@ class UserService {
 
     if (!isValidOperation) {
       const error = new Error('Invalid updates');
-      error.statusCode = 400;
+      error.statusCode = 409;
       throw error;
     }
 
