@@ -10,6 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: npm install
+      - name: Run tests
+        run: npm run test
         env: 
           DB_URL: ${{ secrets.DB_URL }}
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
@@ -20,5 +22,3 @@ jobs:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           BASE_URL: ${{ secrets.BASE_URL }}
-      - name: Run tests
-        run: npm run test
