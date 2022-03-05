@@ -1,0 +1,26 @@
+name: Run Linter and Tests 
+
+on:
+  push:
+    branches:
+      - 'staging'
+      - 'master'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm install
+        env: 
+          DB_URL: ${{ secrets.DB_URL }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+          USER_TOKEN: ${{ secrets.USER_TOKEN }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+      - name: Run tests
+        run: npm run test
