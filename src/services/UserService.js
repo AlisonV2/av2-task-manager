@@ -40,15 +40,17 @@ class UserService {
       throw error;
     }
   }
-  
+
   static async updateUser(user, data) {
-    const updates = Object.keys(data)
+    const updates = Object.keys(data);
     const allowedUpdates = ['name'];
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+    const isValidOperation = updates.every((update) =>
+      allowedUpdates.includes(update)
+    );
 
     if (!isValidOperation) {
-      const error = new Error('Invalid updates')
-      error.statusCode = 400
+      const error = new Error('Invalid updates');
+      error.statusCode = 400;
       throw error;
     }
 
@@ -81,6 +83,30 @@ class UserService {
     } catch (err) {
       const error = new Error('Error deleting user');
       error.statusCode = 400;
+      throw error;
+    }
+  }
+
+  static async getAllUsers(user) {
+    try {
+      if (user.role !== 'admin') {
+        const error = new Error('Unauthorized');
+        error.statusCode = 403;
+        throw error;
+      }
+
+      const users = await UserRepository.getAllUsers();
+
+      if (users.length === 0) {
+        const error = new Error('No users found');
+        error.statusCode = 404;
+        throw error;
+      }
+
+      return users.map((u) => UserRepository.formatUser(u));
+    } catch (err) {
+      const error = new Error(err.message);
+      error.statusCode = err.statusCode;
       throw error;
     }
   }

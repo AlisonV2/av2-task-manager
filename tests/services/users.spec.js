@@ -1,6 +1,6 @@
 import { connect, disconnect, clear } from '../fixtures/database';
 import UserService from '../../src/services/UserService';
-import { createUser } from '../fixtures/users';
+import { createUser, createAdmin } from '../fixtures/users';
 
 beforeAll(async () => connect());
 beforeEach(async () => clear());
@@ -98,4 +98,39 @@ describe('User Service', () => {
     const deletedUser = await UserService.deleteUser({ id: createdUser._id });
     expect(deletedUser).toBe('User deleted successfully');
   });
+
+  test('Should get all users if admin', async () => {
+    await createUser();
+    const createdAdmin = await createAdmin();
+    const users = await UserService.getAllUsers({ role: 'admin', id: createdAdmin._id });
+    expect(users.length).toBe(2);
+  })
+
+  test('Should throw an error if user is not admin', async () => {
+    try {
+      const createdUser = await createUser();
+      await UserService.getAllUsers({ role: 'user', id: createdUser._id});
+    } catch (err) {
+      expect(err.message).toBe('Unauthorized');
+      expect(err.statusCode).toBe(403);
+    }
+  });
+
+  test('Should throw an error if no user is found (admin view)', async () => {
+    try {
+      await UserService.getAllUsers({ role: 'admin'});
+    } catch (err) {
+      expect(err.message).toBe('No users found');
+      expect(err.statusCode).toBe(404);
+    }
+  });
+
+  test('Should throw an error if deleting user fails', async () => {
+    try {
+      await UserService.deleteUser(user);
+    } catch (err) {
+      expect(err.message).toBe('Error deleting user');
+      expect(err.statusCode).toBe(400);
+    }
+  })
 });

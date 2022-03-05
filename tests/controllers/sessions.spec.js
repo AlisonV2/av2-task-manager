@@ -1,7 +1,12 @@
 import request from 'supertest';
 import app from '../fixtures/app';
 import { connect, disconnect, clear } from '../fixtures/database';
-import { createUser, createAccessToken, deleteUser } from '../fixtures/users';
+import {
+  createUser,
+  createAccessToken,
+  deleteUser,
+  createLoggedUser,
+} from '../fixtures/users';
 
 beforeAll(async () => connect());
 beforeEach(async () => clear());
@@ -35,10 +40,10 @@ describe('Session routes', () => {
   });
 
   test('Should log user out', async () => {
-    const { token } = await createAccessToken();
+    const { accessToken } = await createLoggedUser();
     await request(app)
       .delete('/api/sessions')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send()
       .expect(204);
   });
@@ -63,5 +68,14 @@ describe('Session routes', () => {
       .expect(401);
 
     expect(response.body).toBe('Not authorized');
+  });
+
+  test('Should throw an error if user is not logged in', async () => {
+    const { token } = await createAccessToken();
+    await request(app)
+      .delete('/api/sessions')
+      .set('Authorization', `Bearer ${token}`)
+      .send()
+      .expect(401);
   });
 });
