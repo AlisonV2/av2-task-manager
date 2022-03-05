@@ -1,7 +1,7 @@
 name: Run Linter and Tests 
 
 on:
-  push:
+  pull_request:
     branches:
       - 'staging'
       - 'master'

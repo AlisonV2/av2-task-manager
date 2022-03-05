@@ -1,6 +1,6 @@
 name: Open PR to Staging Branch on push
 on:
-  pull_request:
+  push:
     branches:
       - 'feat/*'
       - 'fix/*'
