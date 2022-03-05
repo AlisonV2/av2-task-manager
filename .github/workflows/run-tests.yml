@@ -1,10 +1,8 @@
-name: Run Linter and Tests 
+name: Run tests
 
 on:
   pull_request:
-    branches:
-      - 'staging'
-      - 'master'
+    branches: [ staging ]
 
 jobs:
   tests:
