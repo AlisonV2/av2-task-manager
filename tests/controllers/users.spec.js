@@ -101,9 +101,9 @@ describe('Users routes', () => {
       .get('/api/users/current')
       .set('Authorization', `Bearer ${token}`)
       .send()
-      .expect(404);
+      .expect(401);
 
-    expect(response.body).toBe('User not found');
+    expect(response.body).toBe('Not authorized');
   })
 
   test('Should throw an error if deleting user fails', async () => {
@@ -113,9 +113,9 @@ describe('Users routes', () => {
 
       .delete('/api/users/current')
       .set('Authorization', `Bearer ${token}`)
-      .expect(400);
+      .expect(401);
 
-    expect(response.body).toBe('Error deleting user');
+    expect(response.body).toBe('Not authorized');
   })
 
 });

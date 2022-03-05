@@ -4,8 +4,15 @@ Bordeaux Ynov M1 - Web Services (March 2022)
 
 ## About the application
 
+REST API created with Node and Express.
 
 ### Functionnalities: 
+
+- Authentication
+- Email verification
+- Tasks Manager
+- Time logger
+- Admin interface
 
 ### Stack
 
@@ -43,7 +50,7 @@ Authentication is provided through HTTP Header Authorization, in the following f
 - POST /tasks : Create a new task
 - GET /tasks : Get all tasks for current user
 - GET /tasks/:id : Get a task by id for current user
-- PUT /tasks/:id : Update a task by id for current user
+- PUT /tasks/:id : Update a task by id for current user. Logging time is required to complete a task. 
 - DELETE /tasks/:id : Delete a task by id for current user
 
 ## Documentation
@@ -61,7 +68,7 @@ Each feat/* branch is linked to an US on Jira. Keeping the US in the branch name
 
 ```sh
 npm install
-npm run dev
+npm run devpow
 ```
 
 ## Tests

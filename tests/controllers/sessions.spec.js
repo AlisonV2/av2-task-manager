@@ -60,8 +60,8 @@ describe('Session routes', () => {
       .delete('/api/sessions')
       .set('Authorization', `Bearer ${token}`)
       .send()
-      .expect(404);
+      .expect(401);
 
-    expect(response.body).toBe('User not found');
+    expect(response.body).toBe('Not authorized');
   });
 });
