@@ -22,6 +22,10 @@ const Task = Database.createModel(
       type: String,
       required: true,
     },
+    time: {
+      type: Number,
+      default: 0,
+    }
   },
   {
     timestamps: true,

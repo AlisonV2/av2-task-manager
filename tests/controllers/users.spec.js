@@ -1,8 +1,9 @@
 import request from 'supertest';
 import app from '../fixtures/app';
 import { connect, disconnect, clear } from '../fixtures/database';
-import { createUser, createAccessToken, deleteUser } from '../fixtures/users';
+import { createUser, createAccessToken, deleteUser, createAdminToken } from '../fixtures/users';
 import nodemailer from 'nodemailer';
+import UserController from '../../src/controllers/UserController';
 
 const sendMailMock = jest
   .fn()
@@ -69,7 +70,7 @@ describe('Users routes', () => {
       .send({
         id: 'user123456',
       })
-      .expect(400);
+      .expect(409);
 
     expect(response.body).toBe('Invalid updates');
   });
@@ -77,11 +78,10 @@ describe('Users routes', () => {
   test('Should delete a user', async () => {
     const { token } = await createAccessToken();
     await request(app)
-        .delete('/api/users/current')
-        .set('Authorization', `Bearer ${token}`)
-        .expect(204);
-    }
-  );
+      .delete('/api/users/current')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(204);
+  });
 
   test('Should get a specific user', async () => {
     const { user, token } = await createAccessToken();
@@ -92,30 +92,71 @@ describe('Users routes', () => {
       .expect(200);
 
     expect(response.body.name).toBe(user.name);
-  })
+  });
 
-  test('Should throw an error if the user does not exist', async () => {
+  test('Should throw an error in middleware if the user does not exist', async () => {
     const { user, token } = await createAccessToken();
-    await deleteUser(user._id)
+    await deleteUser(user._id);
     const response = await request(app)
       .get('/api/users/current')
       .set('Authorization', `Bearer ${token}`)
       .send()
-      .expect(404);
+      .expect(401);
 
-    expect(response.body).toBe('User not found');
-  })
+    expect(response.body).toBe('Not authorized');
+  });
 
   test('Should throw an error if deleting user fails', async () => {
     const { user, token } = await createAccessToken();
-    await deleteUser(user._id)
+    await deleteUser(user._id);
     const response = await request(app)
-
       .delete('/api/users/current')
       .set('Authorization', `Bearer ${token}`)
-      .expect(400);
+      .expect(401);
 
-    expect(response.body).toBe('Error deleting user');
+    expect(response.body).toBe('Not authorized');
+  });
+
+  test('Should throw an error in controller if error getting user', async () => {
+    try {
+      const user = {
+        id: '1231dsf4sqdfsdds',
+      };
+      await UserController.getUser({ user }, {});
+    } catch (err) {
+      expect(err.message).toBeTruthy();
+    }
+  });
+
+  test('Should throw an error in controller if deleting a user fails', async () => {
+    try {
+      const user = {
+        id: '1231dsf4sqdfsdds',
+      };
+      await UserController.deleteUser({ user }, {});
+    } catch (err) {
+      expect(err.message).toBeTruthy();
+      expect(err.statusCode).toBe(undefined);
+    }
+  });
+
+  test('Should get users if admin', async () => {
+    const { token } = await createAdminToken();
+    const response = await request(app)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${token}`)
+      .send()
+      .expect(200);
+
+    expect(response.body.length).toBe(1);
   })
 
+  test('Should throw an error if not admin', async () => {
+    const { token } = await createAccessToken();
+    await request(app)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${token}`)
+      .send()
+      .expect(403);
+  })
 });

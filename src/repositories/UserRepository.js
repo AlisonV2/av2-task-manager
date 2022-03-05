@@ -38,6 +38,10 @@ class UserRepository {
     const user = await this.getUser({ _id: id });
     return user.remove();
   }
+
+  static getAllUsers() {
+    return User.find();
+  }
 }
 
 export default UserRepository;

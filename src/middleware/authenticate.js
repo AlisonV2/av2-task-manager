@@ -1,4 +1,5 @@
 import SecurityService from '../services/SecurityService';
+import UserService from '../services/UserService';
 
 const authenticate = async (req, res, next) => {
   try {
@@ -6,11 +7,9 @@ const authenticate = async (req, res, next) => {
     const token = header.split(' ')[1];
 
     const decoded = SecurityService.verifyAccessToken(token);
+    const user = await UserService.getUser({ id: decoded.id });
 
-    req.user = {
-      id: decoded.id,
-      role: decoded.role,
-    };
+    req.user = user;
 
     next();
   } catch (err) {

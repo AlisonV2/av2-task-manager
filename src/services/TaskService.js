@@ -20,18 +20,27 @@ class TaskService {
   }
 
   static async updateTask(user, id, task) {
-    const updates = Object.keys(task)
-    const allowedUpdates = ['title', 'description', 'status']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+    const updates = Object.keys(task);
+    const allowedUpdates = ['title', 'description', 'status', 'time'];
+    const isValidOperation = updates.every((update) =>
+      allowedUpdates.includes(update)
+    );
 
     if (!isValidOperation) {
-      const error = new Error('Invalid updates')
-      error.statusCode = 400
+      const error = new Error('Invalid updates');
+      error.statusCode = 409;
       throw error;
     }
-    
+
     try {
       const query = { _id: id, user: user.id };
+
+      if (task.status === 'completed' && !task.time) {
+        const error = new Error('Logging time is required to complete a task');
+        error.statusCode = 409;
+        throw error;
+      }
+
       const updatedTask = await TaskRepository.updateTask(query, task);
 
       return TaskRepository.formatTask(updatedTask);
@@ -68,9 +77,45 @@ class TaskService {
     }
   }
 
+  static isOperationAllowed(filters, allowedFilters) {
+    const filtersKeys = Object.keys(filters);
+    const isAllowed = filtersKeys.every((filter) =>
+      allowedFilters.includes(filter)
+    );
+
+    if (!isAllowed) {
+      const error = new Error('Forbidden filters');
+      error.statusCode = 403;
+      throw error;
+    }
+  }
   static async getTasks(user, filters) {
     try {
-      let match = { user: user.id };
+      const allowedFilters =
+        user.role === 'admin'
+          ? ['admin', 'user', 'status', 'sort', 'limit', 'page']
+          : ['status', 'sort', 'limit', 'page'];
+
+      this.isOperationAllowed(filters, allowedFilters);
+
+      let match = {};
+
+      if (user.role === 'user') {
+        match = { user: user.id };
+      }
+
+      if (user.role === 'admin' && !filters.admin) {
+        match = { user: user.id };
+      }
+
+      if (user.role === 'admin' && filters.admin && filters.user) {
+        match = { user: filters.user };
+      }
+
+      if (user.role === 'admin' && filters.admin && !filters.user) {
+        match = {};
+      }
+
       let sort = {};
       let limit = 0;
       let skip = 0;
@@ -95,7 +140,9 @@ class TaskService {
       const tasks = await TaskRepository.getTasks(match, sort, skip, limit);
 
       if (tasks.length === 0) {
-        throw new Error('No tasks found');
+        const error = new Error('No tasks found');
+        error.statusCode = 404;
+        throw error;
       }
 
       let formattedTasks = [];
@@ -104,8 +151,8 @@ class TaskService {
       }
       return formattedTasks;
     } catch (err) {
-      const error = new Error('No tasks found');
-      error.statusCode = 404;
+      const error = new Error(err.message);
+      error.statusCode = err.statusCode;
       throw error;
     }
   }
