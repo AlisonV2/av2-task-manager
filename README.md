@@ -12,7 +12,7 @@ REST API created with Node and Express.
 - Email verification
 - Tasks Manager
 - Time logger
-- Admin interface
+- Admin access
 
 ### Stack
 
@@ -25,6 +25,7 @@ REST API created with Node and Express.
 ### Users
 
 - POST /users : Create a new user, sends an email to the user with a link to activate the account.
+- GET /users : Get all users, admin only
 - GET /users/current : Get the current user, needs authentication
 - PUT /users/current : Update the current user, needs authentication
 - DELETE /users/current : Delete the current user, needs authentication
@@ -48,7 +49,7 @@ Authentication is provided through HTTP Header Authorization, in the following f
 'Bearer <access_token>'
 
 - POST /tasks : Create a new task
-- GET /tasks : Get all tasks for current user
+- GET /tasks : Get all tasks for current user.
 - GET /tasks/:id : Get a task by id for current user
 - PUT /tasks/:id : Update a task by id for current user. Logging time is required to complete a task. 
 - DELETE /tasks/:id : Delete a task by id for current user

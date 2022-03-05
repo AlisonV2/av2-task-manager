@@ -7,6 +7,7 @@ class TaskRepository {
       title: task.title,
       description: task.description,
       status: task.status,
+      time: task.time
     };
   }
   
