@@ -13,6 +13,7 @@ REST API created with Node and Express.
 - Tasks Manager
 - Time logger
 - Admin access
+- Dockerized
 
 ### Stack
 
