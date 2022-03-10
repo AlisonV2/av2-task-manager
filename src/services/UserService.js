@@ -41,9 +41,25 @@ class UserService {
     }
   }
 
+  static async updatePassword(id, password, old_password) {
+    const foundUser = await UserRepository.getUser({ _id: id });
+    const isValidPassword = await SecurityService.comparePassword(
+      old_password,
+      foundUser.password
+    );
+
+    if (!isValidPassword) {
+      const error = new Error('Invalid password');
+      error.statusCode = 409;
+      throw error;
+    }
+
+    return SecurityService.hashPassword(password);
+  }
+
   static async updateUser(user, data) {
     const updates = Object.keys(data);
-    const allowedUpdates = ['name'];
+    const allowedUpdates = ['name', 'password', 'old_password'];
     const isValidOperation = updates.every((update) =>
       allowedUpdates.includes(update)
     );
@@ -52,6 +68,16 @@ class UserService {
       const error = new Error('Invalid updates');
       error.statusCode = 409;
       throw error;
+    }
+
+    if (data.password && !data.old_password) {
+      const error = new Error('Missing old password');
+      error.statusCode = 409;
+      throw error;
+    }
+
+    if (data.password) {
+      data.password = await this.updatePassword(user.id, data.password, data.old_password);
     }
 
     try {

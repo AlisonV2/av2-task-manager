@@ -20,7 +20,6 @@ class UserRepository {
   }
 
   static async updateUser(user) {
-    // check what fields can be updated
     const updatedUser = await this.getUser({ _id: user.id });
     Object.keys(user).forEach((key) => {
       updatedUser[key] = user[key];

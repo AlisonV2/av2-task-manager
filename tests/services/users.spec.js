@@ -133,4 +133,49 @@ describe('User Service', () => {
       expect(err.statusCode).toBe(400);
     }
   })
+
+  test('Should return an error if the old_password is missing', async () => {
+    try {
+      const createdUser = await createUser();
+      await UserService.updateUser(
+        { id: createdUser._id },
+        {
+          password: 'user-again123456',
+        }
+      );
+    } catch (err) {
+      expect(err.message).toBe('Missing old password');
+      expect(err.statusCode).toBe(409);
+    }
+  });
+
+  test('Should return an error if the old password does not match', async () => {
+    try {
+      const createdUser = await createUser();
+      await UserService.updateUser(
+        { id: createdUser._id },
+        {
+          password: 'user-again123456',
+          old_password: 'wrong-password',
+        }
+      );
+    } catch (err) {
+      expect(err.message).toBe('Invalid password');
+      expect(err.statusCode).toBe(409);
+    }
+  });
+
+  test('Should update user password', async () => {
+    const createdUser = await createUser();
+    const updatedUser = await UserService.updateUser(
+      { id: createdUser._id },
+      {
+        name: 'UpdatedUser',
+        password: 'user-again123456',
+        old_password: 'test123456',
+      }
+    );
+
+    expect(updatedUser.name).toBe('UpdatedUser');
+  });
 });

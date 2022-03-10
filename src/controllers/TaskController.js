@@ -6,7 +6,7 @@ class TaskController {
     try {
       const newTask = await TaskService.createTask(req.user, req.body);
       const links = LinksGenerator.generateLinks('singleTask', newTask.id);
-      res.status(201).json({...newTask, links });
+      res.status(201).json({ ...newTask, links });
     } catch (err) {
       res.status(err.statusCode).json(err.message);
     }
@@ -20,7 +20,7 @@ class TaskController {
         req.body
       );
       const links = LinksGenerator.generateLinks('singleTask', req.params.id);
-      res.status(200).json({...updatedTask, links});
+      res.status(200).json({ ...updatedTask, links });
     } catch (err) {
       res.status(err.statusCode).json(err.message);
     }
@@ -30,7 +30,7 @@ class TaskController {
     try {
       const task = await TaskService.getTaskById(req.user, req.params.id);
       const links = LinksGenerator.generateLinks('singleTask', req.params.id);
-      res.status(200).json({...task, links});
+      res.status(200).json({ ...task, links });
     } catch (err) {
       res.status(err.statusCode).json(err.message);
     }
@@ -49,8 +49,13 @@ class TaskController {
     try {
       const filters = req.query;
       const tasks = await TaskService.getTasks(req.user, filters);
-      const links = LinksGenerator.generateLinks('allTasks');
-      res.status(200).json({tasks, links});
+
+      for (let task in tasks) {
+        const links = LinksGenerator.generateLinks('singleTask', tasks[task].id);
+        tasks[task] = { ...tasks[task], links };
+      }
+      const allLinks = LinksGenerator.generateLinks('allTasks');
+      res.status(200).json({ tasks, links: allLinks });
     } catch (err) {
       res.status(err.statusCode).json(err.message);
     }
