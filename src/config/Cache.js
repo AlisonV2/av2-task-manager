@@ -17,6 +17,11 @@ export default class Cache {
     return this.cache.set(key, value);
   }
 
+  update(key, value) {
+    this.del(key);
+    return this.set(key, value);
+  }
+
   del(keys) {
     this.cache.del(keys);
   }

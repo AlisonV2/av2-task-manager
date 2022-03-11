@@ -10,30 +10,20 @@ export default class CacheService {
   }
 
   get(key) {
-    console.log('get');
     return this.cache.get(key);
   }
 
   set(key, value) {
-    console.log('set');
     return this.cache.set(key, value);
   }
 
   del(keys) {
-    this.cache.del(keys);
+    return this.cache.del(keys);
   }
 
-  delStartWith(startStr = '') {
-    if (!startStr) {
-      return;
-    }
-
-    const keys = this.cache.keys();
-    for (const key of keys) {
-      if (key.indexOf(startStr) === 0) {
-        this.del(key);
-      }
-    }
+  update(key, value) {
+    this.del(key);
+    return this.set(key, value);
   }
 
   flush() {

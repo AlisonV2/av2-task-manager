@@ -14,6 +14,7 @@ class TaskService {
       };
 
       const createdTask = await TaskRepository.createTask(newTask);
+      cache.set(`task-${createdTask._id}`, createdTask);
       return TaskRepository.formatTask(createdTask);
     } catch (err) {
       const error = new Error('Error creating task');
@@ -45,6 +46,7 @@ class TaskService {
       }
 
       const updatedTask = await TaskRepository.updateTask(query, task);
+      cache.update(`task-${user.id}-${id}`, updatedTask);
 
       return TaskRepository.formatTask(updatedTask);
     } catch (err) {
@@ -57,14 +59,12 @@ class TaskService {
   static async getTaskById(user, id) {
     try {
       const query = { _id: id, user: user.id };
-      const cached = cache.get(`getTaskById-${id}`);
+      const cached = cache.get(`task-${user.id}-${id}`);
 
-      if (cached) {
-        return TaskRepository.formatTask(cached);
-      } 
+      if (cached) return TaskRepository.formatTask(cached);
 
       const task = await TaskRepository.getTask(query);
-      cache.set(`getTaskById-${id}`, task);
+      cache.set(`task-${user.id}-${id}`, task);
       return TaskRepository.formatTask(task);
     } catch (err) {
       const error = new Error('Task not found');
@@ -77,6 +77,7 @@ class TaskService {
     try {
       const query = { _id: id, user: user.id };
       await TaskRepository.deleteTask(query);
+      cache.del(`task-${user.id}-${id}`);
 
       return 'Task deleted successfully';
     } catch (err) {
@@ -98,6 +99,34 @@ class TaskService {
       throw error;
     }
   }
+
+  static formatMatch(user, filters) {    
+    switch (user.role) {
+      case 'user':
+        return { user: user.id };
+      case 'admin':
+        if (!filters.admin) return { user: user.id };
+        if (filters.admin && filters.user) return { user: filters.user };
+        if (filters.admin && !filters.user) return {};
+    }
+  }
+
+  static formatKey(match, sort, skip, limit) {
+    let key = 'tasks';
+    const matchKeys = Object.keys(match);
+    const sortKeys = Object.keys(sort);
+    if (matchKeys.length > 0) {
+      for (let i in matchKeys) {
+        key += '-' + matchKeys[i] + '-' + match[matchKeys[i]];
+      }
+    }
+
+    if (sortKeys.length > 0) key += `-sort-${sortKeys[0]}-${sort[sortKeys[0]]}`;
+    if (skip > 0) key += `-skip-${skip}`;
+    if (limit > 0) key += `-limit-${limit}`;
+    return key;
+  }
+
   static async getTasks(user, filters) {
     try {
       const allowedFilters =
@@ -107,63 +136,45 @@ class TaskService {
 
       this.isOperationAllowed(filters, allowedFilters);
 
-      let match = {};
-
-      if (user.role === 'user') {
-        match = { user: user.id };
-      }
-
-      if (user.role === 'admin' && !filters.admin) {
-        match = { user: user.id };
-      }
-
-      if (user.role === 'admin' && filters.admin && filters.user) {
-        match = { user: filters.user };
-      }
-
-      if (user.role === 'admin' && filters.admin && !filters.user) {
-        match = {};
-      }
+      const match = this.formatMatch(user, filters);
 
       let sort = {};
       let limit = 0;
       let skip = 0;
 
-      if (filters.status) {
-        match.status = filters.status;
-      }
-
+      if (filters.status) match.status = filters.status;
+      if (filters.limit) limit = parseInt(filters.limit);
+      if (filters.page) skip = parseInt(filters.page - 1) * limit;
       if (filters.sort) {
         const parts = filters.sort.split(':');
         sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
       }
 
-      if (filters.limit) {
-        limit = parseInt(filters.limit);
-      }
-
-      if (filters.page) {
-        skip = parseInt(filters.page - 1) * limit;
-      }
+      const key = this.formatKey(match, sort, skip, limit)
+      console.log(key)
 
       const tasks = await TaskRepository.getTasks(match, sort, skip, limit);
-
-      if (tasks.length === 0) {
-        const error = new Error('No tasks found');
-        error.statusCode = 404;
-        throw error;
-      }
-
-      let formattedTasks = [];
-      for (let i in tasks) {
-        formattedTasks.push(TaskRepository.formatTask(tasks[i]));
-      }
-      return formattedTasks;
+      // cache.set(key, tasks);
+      return this.formatAllTasks(tasks);
     } catch (err) {
       const error = new Error(err.message);
       error.statusCode = err.statusCode;
       throw error;
     }
+  }
+
+  static formatAllTasks(tasks) {
+    if (tasks.length === 0) {
+      const error = new Error('No tasks found');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    let formattedTasks = [];
+    for (let i in tasks) {
+      formattedTasks.push(TaskRepository.formatTask(tasks[i]));
+    }
+    return formattedTasks;
   }
 }
 

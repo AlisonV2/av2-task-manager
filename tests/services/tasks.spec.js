@@ -266,7 +266,6 @@ describe('Task Service', () => {
 
   test('Should get user tasks without admin view', async () => {
     await createAdminTasks();
-
     const foundTasks = await TaskService.getTasks(user, {});
     expect(foundTasks.length).toBe(4);
   });
