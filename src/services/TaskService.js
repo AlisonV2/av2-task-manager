@@ -111,22 +111,6 @@ class TaskService {
     }
   }
 
-  static formatKey(match, sort, skip, limit) {
-    let key = 'tasks';
-    const matchKeys = Object.keys(match);
-    const sortKeys = Object.keys(sort);
-    if (matchKeys.length > 0) {
-      for (let i in matchKeys) {
-        key += '-' + matchKeys[i] + '-' + match[matchKeys[i]];
-      }
-    }
-
-    if (sortKeys.length > 0) key += `-sort-${sortKeys[0]}-${sort[sortKeys[0]]}`;
-    if (skip > 0) key += `-skip-${skip}`;
-    if (limit > 0) key += `-limit-${limit}`;
-    return key;
-  }
-
   static async getTasks(user, filters) {
     try {
       const allowedFilters =
@@ -150,11 +134,8 @@ class TaskService {
         sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
       }
 
-      const key = this.formatKey(match, sort, skip, limit)
-      console.log(key)
 
       const tasks = await TaskRepository.getTasks(match, sort, skip, limit);
-      // cache.set(key, tasks);
       return this.formatAllTasks(tasks);
     } catch (err) {
       const error = new Error(err.message);
