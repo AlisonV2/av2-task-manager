@@ -1,4 +1,7 @@
 import TaskRepository from '../repositories/TaskRepository';
+import CacheService from './CacheService';
+
+const cache = new CacheService(3000);
 
 class TaskService {
   static async createTask(user, task) {
@@ -54,8 +57,14 @@ class TaskService {
   static async getTaskById(user, id) {
     try {
       const query = { _id: id, user: user.id };
-      const task = await TaskRepository.getTask(query);
+      const cached = cache.get(`getTaskById-${id}`);
 
+      if (cached) {
+        return TaskRepository.formatTask(cached);
+      } 
+
+      const task = await TaskRepository.getTask(query);
+      cache.set(`getTaskById-${id}`, task);
       return TaskRepository.formatTask(task);
     } catch (err) {
       const error = new Error('Task not found');
