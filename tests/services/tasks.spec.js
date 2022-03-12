@@ -1,13 +1,19 @@
 import { connect, disconnect, clear } from '../fixtures/database';
 import TaskService from '../../src/services/TaskService';
+import CacheService from '../../src/services/CacheService';
 import {
   createTask,
   createManyTasks,
   createAdminTasks,
 } from '../fixtures/tasks';
 
+const cache = new CacheService(3000);
+
 beforeAll(async () => connect());
-beforeEach(async () => clear());
+beforeEach(async () => {
+  await clear();
+  cache.flush();
+});
 afterAll(async () => disconnect());
 
 const user = {
@@ -260,8 +266,17 @@ describe('Task Service', () => {
 
   test('Should get user tasks without admin view', async () => {
     await createAdminTasks();
-
     const foundTasks = await TaskService.getTasks(user, {});
     expect(foundTasks.length).toBe(4);
+  });
+
+  test('Should get task by id from cache', async () => {
+    const createdTask = await createTask();
+    await TaskService.getTaskById(user, createdTask._id);
+    const foundTask = await TaskService.getTaskById(user, createdTask._id);
+
+    expect(foundTask.title).toBe(createdTask.title);
+    expect(foundTask.description).toBe(createdTask.description);
+    expect(foundTask.status).toBe('pending');
   });
 });

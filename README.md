@@ -13,6 +13,7 @@ REST API created with Node and Express.
 - Tasks Manager
 - Time logger
 - Admin access
+- Dockerized
 
 ### Stack
 
@@ -67,9 +68,17 @@ Each feat/* branch is linked to an US on Jira. Keeping the US in the branch name
 
 ## Setup
 
+With docker: 
+
+```sh
+docker-compose up
+```
+
+Without docker:
+
 ```sh
 npm install
-npm run devpow
+npm run dev
 ```
 
 ## Tests
