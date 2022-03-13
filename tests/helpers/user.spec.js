@@ -11,8 +11,9 @@ describe('UserValidator', () => {
     try {
       UserValidator.validateEmail('wrong-email');
     } catch (err) {
+      console.log(err)
       expect(err.message).toBe('Invalid email');
-      expect(err.statusCode).toBe(409);
+      expect(err.statusCode).toBe(422);
     }
   });
 
@@ -24,7 +25,7 @@ describe('UserValidator', () => {
       });
     } catch (err) {
       expect(err.message).toBe('Missing required fields');
-      expect(err.statusCode).toBe(409);
+      expect(err.statusCode).toBe(422);
     }
   });
 
@@ -43,7 +44,7 @@ describe('UserValidator', () => {
       UserValidator.validatePasswordFields({ password: '123456'});
     } catch (err) {
       expect(err.message).toBe('Missing old password');
-      expect(err.statusCode).toBe(409);
+      expect(err.statusCode).toBe(422);
     }
   });
 
@@ -52,7 +53,7 @@ describe('UserValidator', () => {
       UserValidator.validateUpdateFields({ password: '123456', email: 'test@test.com'});
     } catch (err) {
       expect(err.message).toBe('Invalid updates');
-      expect(err.statusCode).toBe(409);
+      expect(err.statusCode).toBe(422);
     }
   });
 

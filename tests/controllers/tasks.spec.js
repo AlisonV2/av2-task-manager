@@ -31,9 +31,9 @@ describe('Task routes', () => {
       .send({
         description: 'Test description',
       })
-      .expect(400);
+      .expect(422);
 
-    expect(response.body).toBe('Error creating task');
+    expect(response.body).toBe('Missing required fields');
   });
 
   test('Should get task by id', async () => {

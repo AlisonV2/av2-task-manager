@@ -1,9 +1,13 @@
+import {
+  InvalidDataError,
+  NotFoundError,
+  ForbiddenError,
+} from '../helpers/ErrorGenerator';
+
 export default class TaskValidator {
   static validateTaskFields(task) {
     if (!task.title || !task.description) {
-      const error = new Error('Missing required fields');
-      error.statusCode = 409;
-      throw error;
+      throw new InvalidDataError('Missing required fields');
     }
   }
 
@@ -15,17 +19,13 @@ export default class TaskValidator {
     );
 
     if (!isValidOperation) {
-      const error = new Error('Invalid updates');
-      error.statusCode = 409;
-      throw error;
+      throw new InvalidDataError('Invalid updates');
     }
   }
 
   static validateCompleteTask(task) {
     if (task.status === 'completed' && !task.time) {
-      const error = new Error('Logging time is required to complete a task');
-      error.statusCode = 409;
-      throw error;
+      throw new InvalidDataError('Logging time is required to complete a task');
     }
   }
 
@@ -41,17 +41,13 @@ export default class TaskValidator {
     );
 
     if (!isAllowed) {
-      const error = new Error('Forbidden filters');
-      error.statusCode = 403;
-      throw error;
+      throw new ForbiddenError('Forbidden filters');
     }
   }
 
   static isEmptyData(tasks) {
     if (tasks.length === 0) {
-      const error = new Error('No tasks found');
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('No tasks found');
     }
   }
 }

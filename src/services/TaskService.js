@@ -6,8 +6,9 @@ const cache = new CacheService(3000);
 
 class TaskService {
   static async createTask(user, task) {
-    try {
+
       TaskValidator.validateTaskFields(task);
+      
       const newTask = {
         title: task.title,
         description: task.description,
@@ -18,22 +19,19 @@ class TaskService {
       const createdTask = await TaskRepository.createTask(newTask);
       cache.set(`task-${createdTask._id}`, createdTask);
       return TaskRepository.formatTask(createdTask);
-    } catch (err) {
-      const error = new Error('Error creating task');
-      error.statusCode = 400;
-      throw error;
-    }
   }
 
   static async updateTask(user, id, task) {
-    TaskValidator.validateUpdateFields(task);
-    try {
-      TaskValidator.validateCompleteTask(task);
 
+    TaskValidator.validateUpdateFields(task);
+    TaskValidator.validateCompleteTask(task);
+
+    try {
       const updatedTask = await TaskRepository.updateTask(
         { _id: id, user: user.id },
         task
       );
+
       cache.update(`task-${user.id}-${id}`, updatedTask);
 
       return TaskRepository.formatTask(updatedTask);

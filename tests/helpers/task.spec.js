@@ -9,7 +9,7 @@ describe('TaskValidator', () => {
       });
     } catch (err) {
       expect(err.message).toBe('Missing required fields');
-      expect(err.statusCode).toBe(409);
+      expect(err.statusCode).toBe(422);
     }
   });
 
@@ -22,7 +22,7 @@ describe('TaskValidator', () => {
       });
     } catch (err) {
       expect(err.message).toBe('Invalid updates');
-      expect(err.statusCode).toBe(409);
+      expect(err.statusCode).toBe(422);
     }
   });
 
@@ -33,7 +33,7 @@ describe('TaskValidator', () => {
       });
     } catch (err) {
       expect(err.message).toBe('Logging time is required to complete a task');
-      expect(err.statusCode).toBe(409);
+      expect(err.statusCode).toBe(422);
     }
   });
 

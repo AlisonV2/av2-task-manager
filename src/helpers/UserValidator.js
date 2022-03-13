@@ -1,30 +1,30 @@
 import SecurityService from '../services/SecurityService';
 import UserRepository from '../repositories/UserRepository';
 import validator from 'validator';
+import {
+  InvalidDataError,
+  BadRequestError,
+  NotFoundError,
+  ForbiddenError,
+} from '../helpers/ErrorGenerator';
 
 export default class DataValidator {
   static validateEmail(email) {
     if (!validator.isEmail(email)) {
-      const error = new Error('Invalid email');
-      error.statusCode = 409;
-      throw error;
+      throw new InvalidDataError('Invalid email');
     }
   }
 
   static validateUserFields(user) {
     if (!user.name || !user.email || !user.password) {
-      const error = new Error('Missing required fields');
-      error.statusCode = 409;
-      throw error;
+      throw new InvalidDataError('Missing required fields');
     }
   }
 
   static async isExistingUser(email) {
     const existingUser = await UserRepository.getUser({ email: email });
     if (existingUser) {
-      const error = new Error('User already exists');
-      error.statusCode = 400;
-      throw error;
+      throw new BadRequestError('User already exists');
     }
   }
 
@@ -35,17 +35,13 @@ export default class DataValidator {
     );
 
     if (!isValidPassword) {
-      const error = new Error('Invalid password');
-      error.statusCode = 409;
-      throw error;
+      throw new InvalidDataError('Invalid password');
     }
   }
 
   static validatePasswordFields(data) {
     if (data.password && !data.old_password) {
-      const error = new Error('Missing old password');
-      error.statusCode = 409;
-      throw error;
+      throw new InvalidDataError('Missing old password');
     }
   }
 
@@ -57,25 +53,19 @@ export default class DataValidator {
     );
 
     if (!isValidOperation) {
-      const error = new Error('Invalid updates');
-      error.statusCode = 409;
-      throw error;
+      throw new InvalidDataError('Invalid updates');
     }
   }
 
   static validateAdminRole(role) {
     if (role !== 'admin') {
-      const error = new Error('Unauthorized');
-      error.statusCode = 403;
-      throw error;
+      throw new ForbiddenError('Unauthorized');
     }
   }
 
   static isEmptyData(users) {
     if (users.length === 0) {
-      const error = new Error('No users found');
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('No users found');
     }
   }
 }

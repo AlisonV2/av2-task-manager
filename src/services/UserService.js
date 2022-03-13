@@ -3,6 +3,7 @@ import EmailService from './EmailService';
 import UserRepository from '../repositories/UserRepository';
 import TaskRepository from '../repositories/TaskRepository';
 import UserValidator from '../helpers/UserValidator';
+import { NotFoundError, BadRequestError } from '../helpers/ErrorGenerator';
 
 // add cache after email validation?
 
@@ -22,16 +23,10 @@ class UserService {
   }
 
   static async register(user) {
-    try {
-      UserValidator.validateEmail(user.email);
-      const newUser = await this.createUser(user);
-      const createdToken = await SecurityService.createToken(newUser);
-      return await EmailService.sendMail(createdToken.token, newUser.email);
-    } catch (err) {
-      const error = new Error(err.message);
-      error.statusCode = 400;
-      throw error;
-    }
+    UserValidator.validateEmail(user.email);
+    const newUser = await this.createUser(user);
+    const createdToken = await SecurityService.createToken(newUser);
+    return EmailService.sendMail(createdToken.token, newUser.email);
   }
 
   static async updatePassword(id, password, old_password) {
@@ -47,22 +42,17 @@ class UserService {
 
   static async updateUser(user, data) {
     UserValidator.validateUpdateFields(data);
-    UserValidator.validatePasswordFields(data);
 
-    try {
-      if (data.password) {
-        data.password = await this.updatePassword(
-          user.id,
-          data.password,
-          data.old_password
-        );
-      }
-      const updatedUser = await UserRepository.updateUser({ ...user, ...data });
-      return UserRepository.formatUser(updatedUser);
-    } catch (err) {
-      const error = new Error('Error updating user');
-      error.statusCode = 400;
+    if (data.password) {
+      UserValidator.validatePasswordFields(data);
+      data.password = await this.updatePassword(
+        user.id,
+        data.password,
+        data.old_password
+      );
     }
+    const updatedUser = await UserRepository.updateUser({ ...user, ...data });
+    return UserRepository.formatUser(updatedUser);
   }
 
   static async getUser(user) {
@@ -70,9 +60,7 @@ class UserService {
       const foundUser = await UserRepository.getUser({ _id: user.id });
       return UserRepository.formatUser(foundUser);
     } catch (err) {
-      const error = new Error('User not found');
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('User not found');
     }
   }
 
@@ -82,26 +70,18 @@ class UserService {
       await TaskRepository.deleteUserTasks(user.id);
       return 'User deleted successfully';
     } catch (err) {
-      const error = new Error('Error deleting user');
-      error.statusCode = 400;
-      throw error;
+      throw new BadRequestError('Error deleting user');
     }
   }
 
   static async getAllUsers(user) {
-    try {
-      UserValidator.validateAdminRole(user.role);
+    UserValidator.validateAdminRole(user.role);
 
-      const users = await UserRepository.getAllUsers();
+    const users = await UserRepository.getAllUsers();
 
-      UserValidator.isEmptyData(users);
+    UserValidator.isEmptyData(users);
 
-      return users.map((u) => UserRepository.formatUser(u));
-    } catch (err) {
-      const error = new Error(err.message);
-      error.statusCode = err.statusCode;
-      throw error;
-    }
+    return users.map((u) => UserRepository.formatUser(u));
   }
 }
 
