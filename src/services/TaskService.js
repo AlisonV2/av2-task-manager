@@ -1,4 +1,5 @@
 import TaskRepository from '../repositories/TaskRepository';
+import TaskValidator from '../helpers/TaskValidator';
 import CacheService from './CacheService';
 
 const cache = new CacheService(3000);
@@ -6,6 +7,7 @@ const cache = new CacheService(3000);
 class TaskService {
   static async createTask(user, task) {
     try {
+      TaskValidator.validateTaskFields(task);
       const newTask = {
         title: task.title,
         description: task.description,
@@ -24,28 +26,14 @@ class TaskService {
   }
 
   static async updateTask(user, id, task) {
-    const updates = Object.keys(task);
-    const allowedUpdates = ['title', 'description', 'status', 'time'];
-    const isValidOperation = updates.every((update) =>
-      allowedUpdates.includes(update)
-    );
-
-    if (!isValidOperation) {
-      const error = new Error('Invalid updates');
-      error.statusCode = 409;
-      throw error;
-    }
-
+    TaskValidator.validateUpdateFields(task);
     try {
-      const query = { _id: id, user: user.id };
+      TaskValidator.validateCompleteTask(task);
 
-      if (task.status === 'completed' && !task.time) {
-        const error = new Error('Logging time is required to complete a task');
-        error.statusCode = 409;
-        throw error;
-      }
-
-      const updatedTask = await TaskRepository.updateTask(query, task);
+      const updatedTask = await TaskRepository.updateTask(
+        { _id: id, user: user.id },
+        task
+      );
       cache.update(`task-${user.id}-${id}`, updatedTask);
 
       return TaskRepository.formatTask(updatedTask);
@@ -58,12 +46,11 @@ class TaskService {
 
   static async getTaskById(user, id) {
     try {
-      const query = { _id: id, user: user.id };
       const cached = cache.get(`task-${user.id}-${id}`);
 
       if (cached) return TaskRepository.formatTask(cached);
 
-      const task = await TaskRepository.getTask(query);
+      const task = await TaskRepository.getTask({ _id: id, user: user.id });
       cache.set(`task-${user.id}-${id}`, task);
       return TaskRepository.formatTask(task);
     } catch (err) {
@@ -75,8 +62,7 @@ class TaskService {
 
   static async deleteTask(user, id) {
     try {
-      const query = { _id: id, user: user.id };
-      await TaskRepository.deleteTask(query);
+      await TaskRepository.deleteTask({ _id: id, user: user.id });
       cache.del(`task-${user.id}-${id}`);
 
       return 'Task deleted successfully';
@@ -87,20 +73,7 @@ class TaskService {
     }
   }
 
-  static isOperationAllowed(filters, allowedFilters) {
-    const filtersKeys = Object.keys(filters);
-    const isAllowed = filtersKeys.every((filter) =>
-      allowedFilters.includes(filter)
-    );
-
-    if (!isAllowed) {
-      const error = new Error('Forbidden filters');
-      error.statusCode = 403;
-      throw error;
-    }
-  }
-
-  static formatMatch(user, filters) {    
+  static formatMatch(user, filters) {
     switch (user.role) {
       case 'user':
         return { user: user.id };
@@ -113,12 +86,7 @@ class TaskService {
 
   static async getTasks(user, filters) {
     try {
-      const allowedFilters =
-        user.role === 'admin'
-          ? ['admin', 'user', 'status', 'sort', 'limit', 'page']
-          : ['status', 'sort', 'limit', 'page'];
-
-      this.isOperationAllowed(filters, allowedFilters);
+      TaskValidator.validateFilters(user, filters);
 
       const match = this.formatMatch(user, filters);
 
@@ -134,7 +102,6 @@ class TaskService {
         sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
       }
 
-
       const tasks = await TaskRepository.getTasks(match, sort, skip, limit);
       return this.formatAllTasks(tasks);
     } catch (err) {
@@ -145,11 +112,7 @@ class TaskService {
   }
 
   static formatAllTasks(tasks) {
-    if (tasks.length === 0) {
-      const error = new Error('No tasks found');
-      error.statusCode = 404;
-      throw error;
-    }
+    TaskValidator.isEmptyData(tasks);
 
     let formattedTasks = [];
     for (let i in tasks) {

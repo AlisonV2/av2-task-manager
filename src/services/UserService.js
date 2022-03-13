@@ -2,22 +2,12 @@ import SecurityService from './SecurityService';
 import EmailService from './EmailService';
 import UserRepository from '../repositories/UserRepository';
 import TaskRepository from '../repositories/TaskRepository';
+import UserValidator from '../helpers/UserValidator';
 
 class UserService {
   static async createUser(user) {
-    const existingUser = await UserRepository.getUser({ email: user.email });
-
-    if (existingUser) {
-      const error = new Error('User already exists');
-      error.statusCode = 400;
-      throw error;
-    }
-
-    if (!user.name || !user.email || !user.password) {
-      const error = new Error('Missing required fields');
-      error.statusCode = 409;
-      throw error;
-    }
+    await UserValidator.isExistingUser(user.email);
+    UserValidator.validateUserFields(user);
 
     const hashed = await SecurityService.hashPassword(user.password);
     const newUser = await UserRepository.createUser({
@@ -31,6 +21,7 @@ class UserService {
 
   static async register(user) {
     try {
+      UserValidator.validateEmail(user.email);
       const newUser = await this.createUser(user);
       const createdToken = await SecurityService.createToken(newUser);
       return await EmailService.sendMail(createdToken.token, newUser.email);
@@ -43,44 +34,27 @@ class UserService {
 
   static async updatePassword(id, password, old_password) {
     const foundUser = await UserRepository.getUser({ _id: id });
-    const isValidPassword = await SecurityService.comparePassword(
-      old_password,
-      foundUser.password
-    );
 
-    if (!isValidPassword) {
-      const error = new Error('Invalid password');
-      error.statusCode = 409;
-      throw error;
-    }
+    await UserValidator.validatePasswordUpdate(
+      foundUser.password,
+      old_password
+    );
 
     return SecurityService.hashPassword(password);
   }
 
   static async updateUser(user, data) {
-    const updates = Object.keys(data);
-    const allowedUpdates = ['name', 'password', 'old_password'];
-    const isValidOperation = updates.every((update) =>
-      allowedUpdates.includes(update)
-    );
-
-    if (!isValidOperation) {
-      const error = new Error('Invalid updates');
-      error.statusCode = 409;
-      throw error;
-    }
-
-    if (data.password && !data.old_password) {
-      const error = new Error('Missing old password');
-      error.statusCode = 409;
-      throw error;
-    }
-
-    if (data.password) {
-      data.password = await this.updatePassword(user.id, data.password, data.old_password);
-    }
+    UserValidator.validateUpdateFields(data);
+    UserValidator.validatePasswordFields(data);
 
     try {
+      if (data.password) {
+        data.password = await this.updatePassword(
+          user.id,
+          data.password,
+          data.old_password
+        );
+      }
       const updatedUser = await UserRepository.updateUser({ ...user, ...data });
       return UserRepository.formatUser(updatedUser);
     } catch (err) {
@@ -92,7 +66,6 @@ class UserService {
   static async getUser(user) {
     try {
       const foundUser = await UserRepository.getUser({ _id: user.id });
-
       return UserRepository.formatUser(foundUser);
     } catch (err) {
       const error = new Error('User not found');
@@ -115,19 +88,11 @@ class UserService {
 
   static async getAllUsers(user) {
     try {
-      if (user.role !== 'admin') {
-        const error = new Error('Unauthorized');
-        error.statusCode = 403;
-        throw error;
-      }
+      UserValidator.validateAdminRole(user.role);
 
       const users = await UserRepository.getAllUsers();
 
-      if (users.length === 0) {
-        const error = new Error('No users found');
-        error.statusCode = 404;
-        throw error;
-      }
+      UserValidator.isEmptyData(users);
 
       return users.map((u) => UserRepository.formatUser(u));
     } catch (err) {
