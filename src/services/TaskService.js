@@ -1,5 +1,5 @@
 import TaskRepository from '../repositories/TaskRepository';
-import TaskValidator from '../helpers/TaskValidator';
+import DataValidator from '../helpers/DataValidator';
 import CacheService from './CacheService';
 
 const cache = new CacheService(3000);
@@ -7,7 +7,7 @@ const cache = new CacheService(3000);
 class TaskService {
   static async createTask(user, task) {
 
-      TaskValidator.validateTaskFields(task);
+      DataValidator.validateTaskFields(task);
       
       const newTask = {
         title: task.title,
@@ -23,8 +23,8 @@ class TaskService {
 
   static async updateTask(user, id, task) {
 
-    TaskValidator.validateUpdateFields(task);
-    TaskValidator.validateCompleteTask(task);
+    DataValidator.validateUpdateFields(task, 'task');
+    DataValidator.validateCompleteTask(task);
 
     try {
       const updatedTask = await TaskRepository.updateTask(
@@ -84,7 +84,7 @@ class TaskService {
 
   static async getTasks(user, filters) {
     try {
-      TaskValidator.validateFilters(user, filters);
+      DataValidator.validateFilters(user, filters);
 
       const match = this.formatMatch(user, filters);
 
@@ -110,7 +110,7 @@ class TaskService {
   }
 
   static formatAllTasks(tasks) {
-    TaskValidator.isEmptyData(tasks);
+    DataValidator.isEmptyData(tasks, 'tasks');
 
     let formattedTasks = [];
     for (let i in tasks) {

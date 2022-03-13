@@ -1,13 +1,13 @@
 import UserRepository from '../repositories/UserRepository';
 import SecurityService from './SecurityService';
-import TokenValidator from '../helpers/TokenValidator';
+import DataValidator from '../helpers/DataValidator';
 
 class TokenService {
   static async refreshToken(refresh) {
     try {
       const user = await UserRepository.getUser({ token: refresh });
 
-      TokenValidator.isUserAuthenticated(user);
+      DataValidator.isUserAuthenticated(user);
       SecurityService.verifyRefreshToken(refresh);
 
       return SecurityService.generateAccessToken(user);

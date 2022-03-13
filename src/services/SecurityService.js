@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import TokenRepository from '../repositories/TokenRepository';
+import { NotFoundError } from '../helpers/ErrorGenerator';
 
 dotenv.config();
 
@@ -59,7 +60,7 @@ class SecurityService {
       tokenObject.email !== userToken.email ||
       tokenObject.user !== userToken.id
     ) {
-      throw new Error('Invalid link');
+      throw new NotFoundError('Invalid link')
     }
     return userToken;
   }
@@ -72,9 +73,7 @@ class SecurityService {
   static async getToken(token) {
     const foundToken = await TokenRepository.getToken({ token })
     if (!foundToken) {
-      const error = new Error('Invalid link');
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('Invalid link')
     }
     return foundToken;
   }

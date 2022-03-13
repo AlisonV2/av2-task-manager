@@ -6,9 +6,21 @@ import {
   BadRequestError,
   NotFoundError,
   ForbiddenError,
+  UnauthorizedError
 } from '../helpers/ErrorGenerator';
 
 export default class DataValidator {
+  static isUserAuthenticated(user) {
+    if (!user) {
+      throw new UnauthorizedError('Not authenticated');
+    }
+  }
+
+  static isUserLoggedIn(token) {
+    if (!token) {
+      throw new UnauthorizedError('Not authenticated');
+    }
+  }
   static validateEmail(email) {
     if (!validator.isEmail(email)) {
       throw new InvalidDataError('Invalid email');
@@ -45,9 +57,12 @@ export default class DataValidator {
     }
   }
 
-  static validateUpdateFields(data) {
+  static validateUpdateFields(data, type) {
     const updates = Object.keys(data);
-    const allowedUpdates = ['name', 'password', 'old_password'];
+    const allowedUpdates =
+      type === 'user'
+        ? ['name', 'password', 'old_password']
+        : ['title', 'description', 'status', 'time'];
     const isValidOperation = updates.every((update) =>
       allowedUpdates.includes(update)
     );
@@ -63,9 +78,36 @@ export default class DataValidator {
     }
   }
 
-  static isEmptyData(users) {
-    if (users.length === 0) {
-      throw new NotFoundError('No users found');
+  static isEmptyData(data, type) {
+    if (data.length === 0) {
+      throw new NotFoundError(`No ${type} found`);
+    }
+  }
+  static validateTaskFields(task) {
+    if (!task.title || !task.description) {
+      throw new InvalidDataError('Missing required fields');
+    }
+  }
+
+  static validateCompleteTask(task) {
+    if (task.status === 'completed' && !task.time) {
+      throw new InvalidDataError('Logging time is required to complete a task');
+    }
+  }
+
+  static validateFilters(user, filters) {
+    const allowedFilters =
+      user.role === 'admin'
+        ? ['admin', 'user', 'status', 'sort', 'limit', 'page']
+        : ['status', 'sort', 'limit', 'page'];
+
+    const filtersKeys = Object.keys(filters);
+    const isAllowed = filtersKeys.every((filter) =>
+      allowedFilters.includes(filter)
+    );
+
+    if (!isAllowed) {
+      throw new ForbiddenError('Forbidden filters');
     }
   }
 }

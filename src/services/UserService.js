@@ -2,15 +2,15 @@ import SecurityService from './SecurityService';
 import EmailService from './EmailService';
 import UserRepository from '../repositories/UserRepository';
 import TaskRepository from '../repositories/TaskRepository';
-import UserValidator from '../helpers/UserValidator';
+import DataValidator from '../helpers/DataValidator';
 import { NotFoundError, BadRequestError } from '../helpers/ErrorGenerator';
 
 // add cache after email validation?
 
 class UserService {
   static async createUser(user) {
-    await UserValidator.isExistingUser(user.email);
-    UserValidator.validateUserFields(user);
+    await DataValidator.isExistingUser(user.email);
+    DataValidator.validateUserFields(user);
 
     const hashed = await SecurityService.hashPassword(user.password);
     const newUser = await UserRepository.createUser({
@@ -23,7 +23,7 @@ class UserService {
   }
 
   static async register(user) {
-    UserValidator.validateEmail(user.email);
+    DataValidator.validateEmail(user.email);
     const newUser = await this.createUser(user);
     const createdToken = await SecurityService.createToken(newUser);
     return EmailService.sendMail(createdToken.token, newUser.email);
@@ -32,7 +32,7 @@ class UserService {
   static async updatePassword(id, password, old_password) {
     const foundUser = await UserRepository.getUser({ _id: id });
 
-    await UserValidator.validatePasswordUpdate(
+    await DataValidator.validatePasswordUpdate(
       foundUser.password,
       old_password
     );
@@ -41,10 +41,10 @@ class UserService {
   }
 
   static async updateUser(user, data) {
-    UserValidator.validateUpdateFields(data);
+    DataValidator.validateUpdateFields(data, 'user');
 
     if (data.password) {
-      UserValidator.validatePasswordFields(data);
+      DataValidator.validatePasswordFields(data);
       data.password = await this.updatePassword(
         user.id,
         data.password,
@@ -75,11 +75,11 @@ class UserService {
   }
 
   static async getAllUsers(user) {
-    UserValidator.validateAdminRole(user.role);
+    DataValidator.validateAdminRole(user.role);
 
     const users = await UserRepository.getAllUsers();
 
-    UserValidator.isEmptyData(users);
+    DataValidator.isEmptyData(users, 'users');
 
     return users.map((u) => UserRepository.formatUser(u));
   }

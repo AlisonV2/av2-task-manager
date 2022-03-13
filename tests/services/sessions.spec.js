@@ -60,7 +60,7 @@ describe('User Service', () => {
       });
     } catch (err) {
       expect(err.message).toBe('Invalid password');
-      expect(err.statusCode).toBe(401);
+      expect(err.statusCode).toBe(422);
     }
   });
 
