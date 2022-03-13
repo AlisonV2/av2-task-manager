@@ -4,6 +4,8 @@ import UserRepository from '../repositories/UserRepository';
 import TaskRepository from '../repositories/TaskRepository';
 import UserValidator from '../helpers/UserValidator';
 
+// add cache after email validation?
+
 class UserService {
   static async createUser(user) {
     await UserValidator.isExistingUser(user.email);
