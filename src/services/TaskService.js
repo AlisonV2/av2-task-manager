@@ -18,7 +18,7 @@ class TaskService {
 
       const createdTask = await TaskRepository.createTask(newTask);
       cache.set(`task-${createdTask._id}`, createdTask);
-      return TaskRepository.formatTask(createdTask);
+      return TaskRepository.formatTask(createdTask, user.name);
   }
 
   static async updateTask(user, id, task) {
@@ -34,7 +34,7 @@ class TaskService {
 
       cache.update(`task-${user.id}-${id}`, updatedTask);
 
-      return TaskRepository.formatTask(updatedTask);
+      return TaskRepository.formatTask(updatedTask, user.name);
     } catch (err) {
       const error = new Error('Error updating task');
       error.statusCode = 400;
@@ -50,7 +50,7 @@ class TaskService {
 
       const task = await TaskRepository.getTask({ _id: id, user: user.id });
       cache.set(`task-${user.id}-${id}`, task);
-      return TaskRepository.formatTask(task);
+      return TaskRepository.formatTask(task, user.name);
     } catch (err) {
       const error = new Error('Task not found');
       error.statusCode = 404;
@@ -101,7 +101,7 @@ class TaskService {
       }
 
       const tasks = await TaskRepository.getTasks(match, sort, skip, limit);
-      return this.formatAllTasks(tasks);
+      return this.formatAllTasks(tasks, user.name);
     } catch (err) {
       const error = new Error(err.message);
       error.statusCode = err.statusCode;
@@ -109,12 +109,13 @@ class TaskService {
     }
   }
 
-  static formatAllTasks(tasks) {
+  static formatAllTasks(tasks, userName) {
     DataValidator.isEmptyData(tasks, 'tasks');
+    console.log(userName)
 
     let formattedTasks = [];
     for (let i in tasks) {
-      formattedTasks.push(TaskRepository.formatTask(tasks[i]));
+      formattedTasks.push(TaskRepository.formatTask(tasks[i], userName));
     }
     return formattedTasks;
   }

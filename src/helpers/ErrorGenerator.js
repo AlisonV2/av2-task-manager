@@ -38,4 +38,10 @@ class UnauthorizedError extends Error {
   }
 }
 
-export { InvalidDataError, BadRequestError, NotFoundError, ForbiddenError, UnauthorizedError };
+export {
+  InvalidDataError,
+  BadRequestError,
+  NotFoundError,
+  ForbiddenError,
+  UnauthorizedError,
+};
