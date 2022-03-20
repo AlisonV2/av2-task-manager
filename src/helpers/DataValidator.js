@@ -9,6 +9,7 @@ import {
   UnauthorizedError
 } from '../helpers/ErrorGenerator';
 
+
 export default class DataValidator {
   static isUserAuthenticated(user) {
     if (!user) {

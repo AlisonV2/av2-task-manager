@@ -111,7 +111,6 @@ class TaskService {
 
   static formatAllTasks(tasks, userName) {
     DataValidator.isEmptyData(tasks, 'tasks');
-    console.log(userName)
 
     let formattedTasks = [];
     for (let i in tasks) {
