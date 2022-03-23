@@ -70,7 +70,7 @@ describe('Users routes', () => {
       .send({
         id: 'user123456',
       })
-      .expect(409);
+      .expect(422);
 
     expect(response.body).toBe('Invalid updates');
   });

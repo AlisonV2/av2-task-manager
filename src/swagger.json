@@ -84,7 +84,7 @@
             "description": "Not authenticated",
             "content": {}
           },
-          "409": {
+          "422": {
             "description": "Missing required fields",
             "content": {}
           }
@@ -188,7 +188,7 @@
             "description": "User not found",
             "content": {}
           },
-          "409": {
+          "422": {
             "description": "Invalid updates",
             "content": {}
           }
@@ -467,7 +467,7 @@
             "description": "Not authenticated",
             "content": {}
           },
-          "409": {
+          "422": {
             "description": "Invalid data",
             "content": {}
           }
@@ -587,7 +587,7 @@
             "description": "Task not found",
             "content": {}
           },
-          "409": {
+          "422": {
             "description": "Invalid update fields"
           }
         },

@@ -1,16 +1,13 @@
 import UserRepository from '../repositories/UserRepository';
 import SecurityService from './SecurityService';
+import DataValidator from '../helpers/DataValidator';
+import { NotFoundError } from '../helpers/ErrorGenerator';
 
 class TokenService {
   static async refreshToken(refresh) {
     try {
       const user = await UserRepository.getUser({ token: refresh });
-
-      if (!user) {
-        const error = new Error('Not authenticated');
-        error.statusCode = 401;
-        throw error;
-      }
+      DataValidator.isUserAuthenticated(user);
 
       SecurityService.verifyRefreshToken(refresh);
 
@@ -37,9 +34,7 @@ class TokenService {
 
       return 'Email verified';
     } catch (err) {
-      const error = new Error('Invalid link');
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('Invalid link');
     }
   }
 }
