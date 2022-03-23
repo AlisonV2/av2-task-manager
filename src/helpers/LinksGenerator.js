@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import apiLinks from './links';
+import apiLinks from '../data/links';
 
 dotenv.config();
 

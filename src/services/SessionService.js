@@ -1,29 +1,26 @@
 import SecurityService from './SecurityService';
 import UserRepository from '../repositories/UserRepository';
+import DataValidator from '../helpers/DataValidator';
+import { NotFoundError, BadRequestError, InvalidDataError } from '../helpers/ErrorGenerator';
 
 class SessionService {
   static async getUserById(id) {
     const user = await UserRepository.getUser({ _id: id });
     if (!user) {
-      const error = new Error('User not found');
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('User not found');
     }
     return user;
   }
+
   static async verifyUser(user) {
     const foundUser = await UserRepository.getUser({ email: user.email });
 
     if (!foundUser) {
-      const error = new Error('User not found');
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('User not found');
     }
 
     if (!foundUser.verified) {
-      const error = new Error('User not verified');
-      error.statusCode = 400;
-      throw error;
+      throw new BadRequestError('User not verified');
     }
 
     const isPasswordValid = await SecurityService.comparePassword(
@@ -32,9 +29,7 @@ class SessionService {
     );
 
     if (!isPasswordValid) {
-      const error = new Error('Invalid password');
-      error.statusCode = 401;
-      throw error;
+      throw new InvalidDataError('Invalid password');
     }
 
     return UserRepository.formatUser(foundUser);
@@ -69,11 +64,7 @@ class SessionService {
     try {
       const foundUser = await this.getUserById(user.id);
 
-      if (!foundUser.token) {
-        const error = new Error('User not logged in');
-        error.statusCode = 401;
-        throw error;
-      }
+      DataValidator.isUserLoggedIn(foundUser.token);
       
       await UserRepository.updateUser({
         ...user,

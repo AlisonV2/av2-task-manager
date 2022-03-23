@@ -1,13 +1,14 @@
 import Task from '../models/Task';
 
 class TaskRepository {
-  static formatTask(task) {
+  static formatTask(task, userName) {
     return {
       id: task._id,
       title: task.title,
       description: task.description,
       status: task.status,
-      time: task.time
+      time: task.time,
+      user: userName
     };
   }
   

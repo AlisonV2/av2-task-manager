@@ -1,4 +1,5 @@
 import User from '../models/User';
+import { NotFoundError } from '../helpers/ErrorGenerator';
 
 class UserRepository {
   static formatUser(user) {
@@ -9,21 +10,27 @@ class UserRepository {
       role: user.role,
     };
   }
-  
+
   static async getUser(query) {
     return User.findOne({ ...query });
   }
 
   static async createUser(user) {
-    const newUser = new User({...user});
+    const newUser = new User({ ...user });
     return newUser.save();
   }
 
   static async updateUser(user) {
     const updatedUser = await this.getUser({ _id: user.id });
+
+    if (!updatedUser) {
+      throw new NotFoundError('User not found');
+    }
+
     Object.keys(user).forEach((key) => {
       updatedUser[key] = user[key];
     });
+
     return updatedUser.save();
   }
 
@@ -34,7 +41,7 @@ class UserRepository {
   }
 
   static async deleteUser(id) {
-    const user = await this.getUser({ _id: id });
+    const user = await this.getUser({ _id: id });    
     return user.remove();
   }
 

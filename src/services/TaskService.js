@@ -1,11 +1,14 @@
 import TaskRepository from '../repositories/TaskRepository';
+import DataValidator from '../helpers/DataValidator';
 import CacheService from './CacheService';
 
 const cache = new CacheService(3000);
 
 class TaskService {
   static async createTask(user, task) {
-    try {
+
+      DataValidator.validateTaskFields(task);
+      
       const newTask = {
         title: task.title,
         description: task.description,
@@ -15,40 +18,23 @@ class TaskService {
 
       const createdTask = await TaskRepository.createTask(newTask);
       cache.set(`task-${createdTask._id}`, createdTask);
-      return TaskRepository.formatTask(createdTask);
-    } catch (err) {
-      const error = new Error('Error creating task');
-      error.statusCode = 400;
-      throw error;
-    }
+      return TaskRepository.formatTask(createdTask, user.name);
   }
 
   static async updateTask(user, id, task) {
-    const updates = Object.keys(task);
-    const allowedUpdates = ['title', 'description', 'status', 'time'];
-    const isValidOperation = updates.every((update) =>
-      allowedUpdates.includes(update)
-    );
 
-    if (!isValidOperation) {
-      const error = new Error('Invalid updates');
-      error.statusCode = 409;
-      throw error;
-    }
+    DataValidator.validateUpdateFields(task, 'task');
+    DataValidator.validateCompleteTask(task);
 
     try {
-      const query = { _id: id, user: user.id };
+      const updatedTask = await TaskRepository.updateTask(
+        { _id: id, user: user.id },
+        task
+      );
 
-      if (task.status === 'completed' && !task.time) {
-        const error = new Error('Logging time is required to complete a task');
-        error.statusCode = 409;
-        throw error;
-      }
-
-      const updatedTask = await TaskRepository.updateTask(query, task);
       cache.update(`task-${user.id}-${id}`, updatedTask);
 
-      return TaskRepository.formatTask(updatedTask);
+      return TaskRepository.formatTask(updatedTask, user.name);
     } catch (err) {
       const error = new Error('Error updating task');
       error.statusCode = 400;
@@ -58,14 +44,13 @@ class TaskService {
 
   static async getTaskById(user, id) {
     try {
-      const query = { _id: id, user: user.id };
       const cached = cache.get(`task-${user.id}-${id}`);
 
       if (cached) return TaskRepository.formatTask(cached);
 
-      const task = await TaskRepository.getTask(query);
+      const task = await TaskRepository.getTask({ _id: id, user: user.id });
       cache.set(`task-${user.id}-${id}`, task);
-      return TaskRepository.formatTask(task);
+      return TaskRepository.formatTask(task, user.name);
     } catch (err) {
       const error = new Error('Task not found');
       error.statusCode = 404;
@@ -75,8 +60,7 @@ class TaskService {
 
   static async deleteTask(user, id) {
     try {
-      const query = { _id: id, user: user.id };
-      await TaskRepository.deleteTask(query);
+      await TaskRepository.deleteTask({ _id: id, user: user.id });
       cache.del(`task-${user.id}-${id}`);
 
       return 'Task deleted successfully';
@@ -87,20 +71,7 @@ class TaskService {
     }
   }
 
-  static isOperationAllowed(filters, allowedFilters) {
-    const filtersKeys = Object.keys(filters);
-    const isAllowed = filtersKeys.every((filter) =>
-      allowedFilters.includes(filter)
-    );
-
-    if (!isAllowed) {
-      const error = new Error('Forbidden filters');
-      error.statusCode = 403;
-      throw error;
-    }
-  }
-
-  static formatMatch(user, filters) {    
+  static formatMatch(user, filters) {
     switch (user.role) {
       case 'user':
         return { user: user.id };
@@ -113,12 +84,7 @@ class TaskService {
 
   static async getTasks(user, filters) {
     try {
-      const allowedFilters =
-        user.role === 'admin'
-          ? ['admin', 'user', 'status', 'sort', 'limit', 'page']
-          : ['status', 'sort', 'limit', 'page'];
-
-      this.isOperationAllowed(filters, allowedFilters);
+      DataValidator.validateFilters(user, filters);
 
       const match = this.formatMatch(user, filters);
 
@@ -134,9 +100,8 @@ class TaskService {
         sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
       }
 
-
       const tasks = await TaskRepository.getTasks(match, sort, skip, limit);
-      return this.formatAllTasks(tasks);
+      return this.formatAllTasks(tasks, user.name);
     } catch (err) {
       const error = new Error(err.message);
       error.statusCode = err.statusCode;
@@ -144,16 +109,12 @@ class TaskService {
     }
   }
 
-  static formatAllTasks(tasks) {
-    if (tasks.length === 0) {
-      const error = new Error('No tasks found');
-      error.statusCode = 404;
-      throw error;
-    }
+  static formatAllTasks(tasks, userName) {
+    DataValidator.isEmptyData(tasks, 'tasks');
 
     let formattedTasks = [];
     for (let i in tasks) {
-      formattedTasks.push(TaskRepository.formatTask(tasks[i]));
+      formattedTasks.push(TaskRepository.formatTask(tasks[i], userName));
     }
     return formattedTasks;
   }

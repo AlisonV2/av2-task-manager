@@ -1,4 +1,3 @@
-import dotenv from 'dotenv';
 import express from 'express';
 import Server from './config/Server';
 import Database from './config/Database';
@@ -7,7 +6,6 @@ import { docsRouter } from './routes/docs';
 import { tasksRouter } from './routes/tasks';
 import { tokensRouter } from './routes/tokens';
 import { sessionsRouter } from './routes/sessions';
-dotenv.config();
 
 const app = express();
 
@@ -21,7 +19,8 @@ app
   .use('/api/users', usersRouter)
   .use('/api/tasks', tasksRouter)
   .use('/api/tokens', tokensRouter)
-  .use('/api/sessions', sessionsRouter);
+  .use('/api/sessions', sessionsRouter)
+  .use(Server.handleErrors)
 
 Database.start();
 

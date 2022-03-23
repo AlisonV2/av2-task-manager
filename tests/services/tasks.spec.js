@@ -64,7 +64,7 @@ describe('Task Service', () => {
         status: 'completed',
       });
     } catch (err) {
-      expect(err.message).toBe('Error updating task');
+      expect(err.message).toBe('Logging time is required to complete a task');
     }
   });
 
@@ -125,7 +125,7 @@ describe('Task Service', () => {
       });
     } catch (err) {
       expect(err.message).toBe('Invalid updates');
-      expect(err.statusCode).toBe(409);
+      expect(err.statusCode).toBe(422);
     }
   });
 
@@ -159,8 +159,8 @@ describe('Task Service', () => {
     try {
       await TaskService.createTask(user, task);
     } catch (err) {
-      expect(err.message).toBe('Error creating task');
-      expect(err.statusCode).toBe(400);
+      expect(err.message).toBe('Missing required fields');
+      expect(err.statusCode).toBe(422);
     }
   });
 

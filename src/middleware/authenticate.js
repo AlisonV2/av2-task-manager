@@ -13,9 +13,7 @@ const authenticate = async (req, res, next) => {
 
     next();
   } catch (err) {
-    res
-      .status(401)
-      .json('Not authorized');
+    res.status(401).json('Not authorized');
   }
 };
 

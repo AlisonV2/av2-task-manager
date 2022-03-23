@@ -22,6 +22,14 @@ class Server {
     next();
   }
 
+  static handleErrors(err, req, res, next) {
+    if (err.statusCode) {
+      res.status(err.statusCode).json(err.message);
+    } else {
+      res.status(500).json('Internal server error');
+    }
+  }
+
   static async start(app) {
     const port = process.env.port || 3000;
     try {

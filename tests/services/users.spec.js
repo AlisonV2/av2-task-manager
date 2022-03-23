@@ -36,7 +36,7 @@ describe('User Service', () => {
       });
     } catch (err) {
       expect(err.message).toBe('Missing required fields');
-      expect(err.statusCode).toBe(409);
+      expect(err.statusCode).toBe(422);
     }
   });
 
@@ -74,7 +74,7 @@ describe('User Service', () => {
       );
     } catch (err) {
       expect(err.message).toBe('Invalid updates');
-      expect(err.statusCode).toBe(409);
+      expect(err.statusCode).toBe(422);
     }
   });
 
@@ -145,7 +145,7 @@ describe('User Service', () => {
       );
     } catch (err) {
       expect(err.message).toBe('Missing old password');
-      expect(err.statusCode).toBe(409);
+      expect(err.statusCode).toBe(422);
     }
   });
 
@@ -161,7 +161,7 @@ describe('User Service', () => {
       );
     } catch (err) {
       expect(err.message).toBe('Invalid password');
-      expect(err.statusCode).toBe(409);
+      expect(err.statusCode).toBe(422);
     }
   });
 
@@ -177,5 +177,18 @@ describe('User Service', () => {
     );
 
     expect(updatedUser.name).toBe('UpdatedUser');
+  });
+
+  test('Should return an error if email is invalid', async () => {
+    try {
+      await UserService.createUser({
+        name: 'WrongEmail',
+        email: 'wrong-email',
+        password: 'test123456',
+      });
+    } catch (err) {
+      expect(err.message).toBe('Invalid email');
+      expect(err.statusCode).toBe(422);
+    }
   });
 });
