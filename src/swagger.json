@@ -74,7 +74,12 @@
         "responses": {
           "201": {
             "description": "User created",
-            "content": {}
+            "content": {},
+            "links": {
+              "currentUser": {
+                "$ref": "#/components/links/currentUser"
+              }
+            }
           },
           "400": {
             "description": "User already exist",
@@ -142,6 +147,11 @@
                   "$ref": "#/components/schemas/User"
                 }
               }
+            },
+            "links": {
+              "currentUser": {
+                "$ref": "#/components/links/currentUser"
+              }
             }
           },
           "401": {
@@ -176,6 +186,15 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "User updated",
+            "content": {},
+            "links": {
+              "currentUser": {
+                "$ref": "#/components/links/currentUser"
+              }
+            }
+          },
           "400": {
             "description": "Error updating user",
             "content": {}
@@ -230,28 +249,51 @@
       }
     },
     "/sessions": {
-      "get": {
+      "post": {
         "tags": ["sessions"],
-        "summary": "Logs user into the system",
+        "summary": "Logs the user in.",
+        "description": "Logs the user in",
         "operationId": "login",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/xml": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "string"
+        "requestBody": {
+          "description": "User credentials (email and password)",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "test@test.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "test123456"
+                  }
                 }
               }
             }
           },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "User login",
+            "content": {},
+            "links": {
+              "login": {
+                "$ref": "#/components/links/login"
+              },
+              "refreshToken": {
+                "$ref": "#/components/links/refreshToken"
+              }
+            }
+          },
           "400": {
-            "description": "Invalid username/password supplied",
+            "description": "Error logging user in",
+            "content": {}
+          },
+          "422": {
+            "description": "Missing required fields",
             "content": {}
           }
         }
@@ -296,6 +338,15 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {},
+            "links": {
+              "refreshToken": {
+                "$ref": "#/components/links/refreshToken"
+              }
+            }
+          },
           "400": {
             "description": "Error refreshing token",
             "content": {}
@@ -327,7 +378,12 @@
         "responses": {
           "200": {
             "description": "Email verified",
-            "content": {}
+            "content": {},
+            "links": {
+              "login": {
+                "$ref": "#/components/links/login"
+              }
+            }
           },
           "404": {
             "description": "Invalid link"
@@ -408,6 +464,14 @@
                   }
                 }
               }
+            },
+            "links": {
+              "getTaskById": {
+                "$ref": "#/components/links/getTaskById"
+              },
+              "getAllTasks": {
+                "$ref": "#/components/links/getAllTasks"
+              }
             }
           },
           "400": {
@@ -457,6 +521,14 @@
                   "$ref": "#/components/schemas/Task"
                 }
               }
+            },
+            "links": {
+              "getTaskById": {
+                "$ref": "#/components/links/getTaskById"
+              },
+              "getAllTasks": {
+                "$ref": "#/components/links/getAllTasks"
+              }
             }
           },
           "400": {
@@ -504,6 +576,14 @@
                 "schema": {
                   "$ref": "#/components/schemas/Task"
                 }
+              }
+            },
+            "links": {
+              "getTaskById": {
+                "$ref": "#/components/links/getTaskById"
+              },
+              "getAllTasks": {
+                "$ref": "#/components/links/getAllTasks"
               }
             }
           },
@@ -573,6 +653,14 @@
                   "$ref": "#/components/schemas/Task"
                 }
               }
+            },
+            "links": {
+              "getTaskById": {
+                "$ref": "#/components/links/getTaskById"
+              },
+              "getAllTasks": {
+                "$ref": "#/components/links/getAllTasks"
+              }
             }
           },
           "400": {
@@ -615,7 +703,12 @@
         "responses": {
           "204": {
             "description": "Task deleted successfully",
-            "content": {}
+            "content": {},
+            "links": {
+              "getAllTasks": {
+                "$ref": "#/components/links/getAllTasks"
+              }
+            }
           },
           "400": {
             "description": "Invalid ID supplied",
@@ -702,6 +795,31 @@
             "default": 0
           }
         }
+      }
+    },
+    "links": {
+      "login": {
+        "operationRef": "/sessions",
+        "description": "Log user in"
+      },
+      "refreshToken": {
+        "operationRef": "/tokens",
+        "description": "Refresh token"
+      },
+      "getTaskById": {
+        "operationRef": "/tasks/{id}",
+        "description": "Get task by ID",
+        "parameters": {
+          "taskId": "$response.body#/id"
+        }
+      },
+      "getAllTasks": {
+        "operationRef": "/tasks",
+        "description": "Get all tasks"
+      },
+      "currentUser": {
+        "operationRef": "/users/current",
+        "description": "Get current user"
       }
     },
     "securitySchemes": {

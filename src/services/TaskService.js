@@ -4,7 +4,7 @@ import CacheService from './CacheService';
 
 const cache = new CacheService(3000);
 
-class TaskService {
+export default class TaskService {
   static async createTask(user, task) {
 
       DataValidator.validateTaskFields(task);
@@ -119,5 +119,3 @@ class TaskService {
     return formattedTasks;
   }
 }
-
-export default TaskService;

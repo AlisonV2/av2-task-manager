@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-class EmailService {
+export default class EmailService {
   static createTransporter() {
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
@@ -31,5 +31,3 @@ class EmailService {
     return `Message sent to: ${email}`;
   }
 }
-
-export default EmailService;

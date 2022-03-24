@@ -5,7 +5,7 @@ dotenv.config();
 
 const baseUrl = process.env.BASE_URL;
 
-class LinksGenerator {
+export default class LinksGenerator {
   static getLink(model, id) {
     switch (model) {
       case 'task':
@@ -37,5 +37,3 @@ class LinksGenerator {
     return links;
   }
 }
-
-export default LinksGenerator;

@@ -1,7 +1,7 @@
 import SessionService from '../services/SessionService';
 import LinksGenerator from '../helpers/LinksGenerator';
 
-class SessionController {
+export default class SessionController {
   static async login(req, res) {
     try {
       const user = await SessionService.login(req.body);
@@ -21,5 +21,3 @@ class SessionController {
     }
   }
 }
-
-export default SessionController;

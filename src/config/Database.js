@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 dotenv.config();
 
-class Database {
+export default class Database {
   static async start() {
     try {
       await mongoose.connect(process.env.DB_URL, {
@@ -21,5 +21,3 @@ class Database {
     return mongoose.model(name, schema);
   }
 }
-
-export default Database;
