@@ -5,9 +5,7 @@ import TaskRepository from '../repositories/TaskRepository';
 import DataValidator from '../helpers/DataValidator';
 import { NotFoundError, BadRequestError } from '../helpers/ErrorGenerator';
 
-// add cache after email validation?
-
-class UserService {
+export default class UserService {
   static async createUser(user) {
     await DataValidator.isExistingUser(user.email);
     DataValidator.validateUserFields(user);
@@ -84,5 +82,3 @@ class UserService {
     return users.map((u) => UserRepository.formatUser(u));
   }
 }
-
-export default UserService;

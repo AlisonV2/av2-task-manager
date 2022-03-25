@@ -1,28 +1,27 @@
 import TaskRepository from '../repositories/TaskRepository';
 import DataValidator from '../helpers/DataValidator';
 import CacheService from './CacheService';
+import { NotFoundError, BadRequestError } from '../helpers/ErrorGenerator';
 
 const cache = new CacheService(3000);
 
-class TaskService {
+export default class TaskService {
   static async createTask(user, task) {
+    DataValidator.validateTaskFields(task);
 
-      DataValidator.validateTaskFields(task);
-      
-      const newTask = {
-        title: task.title,
-        description: task.description,
-        status: task.status,
-        user: user.id,
-      };
+    const newTask = {
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      user: user.id,
+    };
 
-      const createdTask = await TaskRepository.createTask(newTask);
-      cache.set(`task-${createdTask._id}`, createdTask);
-      return TaskRepository.formatTask(createdTask, user.name);
+    const createdTask = await TaskRepository.createTask(newTask);
+    cache.set(`task-${createdTask._id}`, createdTask);
+    return TaskRepository.formatTask(createdTask, user.name);
   }
 
   static async updateTask(user, id, task) {
-
     DataValidator.validateUpdateFields(task, 'task');
     DataValidator.validateCompleteTask(task);
 
@@ -36,9 +35,7 @@ class TaskService {
 
       return TaskRepository.formatTask(updatedTask, user.name);
     } catch (err) {
-      const error = new Error('Error updating task');
-      error.statusCode = 400;
-      throw error;
+      throw new BadRequestError('Error updating task');
     }
   }
 
@@ -52,9 +49,7 @@ class TaskService {
       cache.set(`task-${user.id}-${id}`, task);
       return TaskRepository.formatTask(task, user.name);
     } catch (err) {
-      const error = new Error('Task not found');
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('Task not found');
     }
   }
 
@@ -65,9 +60,7 @@ class TaskService {
 
       return 'Task deleted successfully';
     } catch (err) {
-      const error = new Error('Task not found');
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('Task not found');
     }
   }
 
@@ -119,5 +112,3 @@ class TaskService {
     return formattedTasks;
   }
 }
-
-export default TaskService;

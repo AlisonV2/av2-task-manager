@@ -3,7 +3,7 @@ import SecurityService from './SecurityService';
 import DataValidator from '../helpers/DataValidator';
 import { NotFoundError } from '../helpers/ErrorGenerator';
 
-class TokenService {
+export default class TokenService {
   static async refreshToken(refresh) {
     try {
       const user = await UserRepository.getUser({ token: refresh });
@@ -38,5 +38,3 @@ class TokenService {
     }
   }
 }
-
-export default TokenService;

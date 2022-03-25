@@ -74,19 +74,27 @@
         "responses": {
           "201": {
             "description": "User created",
-            "content": {}
+            "content": {},
+            "links": {
+              "currentUser": {
+                "$ref": "#/components/links/currentUser"
+              }
+            }
           },
           "400": {
-            "description": "User already exist",
-            "content": {}
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Not authenticated",
-            "content": {}
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           },
           "422": {
-            "description": "Missing required fields",
-            "content": {}
+            "$ref": "#/components/responses/InvalidData"
           }
         }
       },
@@ -108,17 +116,14 @@
               }
             }
           },
-          "400": {
-            "description": "Error getting users",
-            "content": {}
-          },
           "401": {
-            "description": "Not authenticated",
-            "content": {}
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "description": "Forbidden",
-            "content": {}
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -142,15 +147,18 @@
                   "$ref": "#/components/schemas/User"
                 }
               }
+            },
+            "links": {
+              "currentUser": {
+                "$ref": "#/components/links/currentUser"
+              }
             }
           },
           "401": {
-            "description": "Not authenticated",
-            "content": {}
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
-            "description": "User not found",
-            "content": {}
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -176,21 +184,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "User updated",
+            "content": {},
+            "links": {
+              "currentUser": {
+                "$ref": "#/components/links/currentUser"
+              }
+            }
+          },
           "400": {
-            "description": "Error updating user",
-            "content": {}
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Not authenticated",
-            "content": {}
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
-            "description": "User not found",
-            "content": {}
+            "$ref": "#/components/responses/NotFound"
           },
           "422": {
-            "description": "Invalid updates",
-            "content": {}
+            "$ref": "#/components/responses/InvalidData"
           }
         },
         "security": [
@@ -210,16 +223,16 @@
             "content": {}
           },
           "400": {
-            "description": "Error deleting user",
-            "content": {}
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Not authenticated",
-            "content": {}
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "User not found",
-            "content": {}
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -230,29 +243,53 @@
       }
     },
     "/sessions": {
-      "get": {
+      "post": {
         "tags": ["sessions"],
-        "summary": "Logs user into the system",
+        "summary": "Logs the user in.",
+        "description": "Logs the user in",
         "operationId": "login",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/xml": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "string"
+        "requestBody": {
+          "description": "User credentials (email and password)",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "test@test.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "test123456"
+                  }
                 }
               }
             }
           },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "User login",
+            "content": {},
+            "links": {
+              "login": {
+                "$ref": "#/components/links/login"
+              },
+              "refreshToken": {
+                "$ref": "#/components/links/refreshToken"
+              }
+            }
+          },
           "400": {
-            "description": "Invalid username/password supplied",
-            "content": {}
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidData"
           }
         }
       },
@@ -296,13 +333,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {},
+            "links": {
+              "refreshToken": {
+                "$ref": "#/components/links/refreshToken"
+              }
+            }
+          },
           "400": {
-            "description": "Error refreshing token",
-            "content": {}
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Not authenticated",
-            "content": {}
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidData"
           }
         }
       }
@@ -327,10 +377,15 @@
         "responses": {
           "200": {
             "description": "Email verified",
-            "content": {}
+            "content": {},
+            "links": {
+              "login": {
+                "$ref": "#/components/links/login"
+              }
+            }
           },
           "404": {
-            "description": "Invalid link"
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -408,23 +463,30 @@
                   }
                 }
               }
+            },
+            "links": {
+              "getTaskById": {
+                "$ref": "#/components/links/getTaskById"
+              },
+              "getAllTasks": {
+                "$ref": "#/components/links/getAllTasks"
+              }
             }
           },
           "400": {
-            "description": "Error retrieving tasks",
-            "content": {}
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Not authenticated",
-            "content": {}
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "description": "Forbidden",
-            "content": {}
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "No task found",
-            "content": {}
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidData"
           }
         },
         "security": [
@@ -457,19 +519,24 @@
                   "$ref": "#/components/schemas/Task"
                 }
               }
+            },
+            "links": {
+              "getTaskById": {
+                "$ref": "#/components/links/getTaskById"
+              },
+              "getAllTasks": {
+                "$ref": "#/components/links/getAllTasks"
+              }
             }
           },
           "400": {
-            "description": "Error creating task",
-            "content": {}
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Not authenticated",
-            "content": {}
+            "$ref": "#/components/responses/Unauthorized"
           },
           "422": {
-            "description": "Invalid data",
-            "content": {}
+            "$ref": "#/components/responses/InvalidData"
           }
         },
         "security": [
@@ -505,19 +572,21 @@
                   "$ref": "#/components/schemas/Task"
                 }
               }
+            },
+            "links": {
+              "getTaskById": {
+                "$ref": "#/components/links/getTaskById"
+              },
+              "getAllTasks": {
+                "$ref": "#/components/links/getAllTasks"
+              }
             }
           },
-          "400": {
-            "description": "Invalid ID supplied",
-            "content": {}
-          },
           "401": {
-            "description": "Not authenticated",
-            "content": {}
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
-            "description": "Task not found",
-            "content": {}
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -573,22 +642,27 @@
                   "$ref": "#/components/schemas/Task"
                 }
               }
+            },
+            "links": {
+              "getTaskById": {
+                "$ref": "#/components/links/getTaskById"
+              },
+              "getAllTasks": {
+                "$ref": "#/components/links/getAllTasks"
+              }
             }
           },
           "400": {
-            "description": "Error updating task",
-            "content": {}
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Not authenticated",
-            "content": {}
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
-            "description": "Task not found",
-            "content": {}
+            "$ref": "#/components/responses/NotFound"
           },
           "422": {
-            "description": "Invalid update fields"
+            "$ref": "#/components/responses/InvalidData"
           }
         },
         "security": [
@@ -615,19 +689,18 @@
         "responses": {
           "204": {
             "description": "Task deleted successfully",
-            "content": {}
-          },
-          "400": {
-            "description": "Invalid ID supplied",
-            "content": {}
+            "content": {},
+            "links": {
+              "getAllTasks": {
+                "$ref": "#/components/links/getAllTasks"
+              }
+            }
           },
           "401": {
-            "description": "Not authenticated",
-            "content": {}
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
-            "description": "Task not found",
-            "content": {}
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -639,6 +712,58 @@
     }
   },
   "components": {
+    "responses": {
+      "BadRequest": {
+        "description": "Error getting the requested resource.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "InvalidData": {
+        "description": "Invalid data",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Not authenticated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Access to resource forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
     "schemas": {
       "User": {
         "required": ["username", "email", "password"],
@@ -702,6 +827,43 @@
             "default": 0
           }
         }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "links": {
+      "login": {
+        "operationRef": "/sessions",
+        "description": "Log user in"
+      },
+      "refreshToken": {
+        "operationRef": "/tokens",
+        "description": "Refresh token"
+      },
+      "getTaskById": {
+        "operationRef": "/tasks/{id}",
+        "description": "Get task by ID",
+        "parameters": {
+          "taskId": "$response.body#/id"
+        }
+      },
+      "getAllTasks": {
+        "operationRef": "/tasks",
+        "description": "Get all tasks"
+      },
+      "currentUser": {
+        "operationRef": "/users/current",
+        "description": "Get current user"
       }
     },
     "securitySchemes": {

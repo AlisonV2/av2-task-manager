@@ -1,7 +1,7 @@
 import TokenService from '../services/TokenService';
 import LinksGenerator from '../helpers/LinksGenerator';
 
-class TokenController {
+export default class TokenController {
   static async refreshToken(req, res) {
     try {
       const accessToken = await TokenService.refreshToken(req.body.refresh);
@@ -25,5 +25,3 @@ class TokenController {
     }
   }
 }
-
-export default TokenController;

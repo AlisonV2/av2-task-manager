@@ -1,7 +1,7 @@
 import TaskService from '../services/TaskService';
 import LinksGenerator from '../helpers/LinksGenerator';
 
-class TaskController {
+export default class TaskController {
   static async createTask(req, res) {
     try {
       const newTask = await TaskService.createTask(req.user, req.body);
@@ -61,5 +61,3 @@ class TaskController {
     }
   }
 }
-
-export default TaskController;

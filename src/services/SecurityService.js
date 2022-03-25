@@ -6,7 +6,7 @@ import { NotFoundError } from '../helpers/ErrorGenerator';
 
 dotenv.config();
 
-class SecurityService {
+export default class SecurityService {
   static async hashPassword(password) {
     return bcrypt.hash(password, 12);
   }
@@ -83,5 +83,3 @@ class SecurityService {
     return TokenRepository.deleteToken({ token });
   }
 }
-
-export default SecurityService;

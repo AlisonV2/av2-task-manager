@@ -1,7 +1,7 @@
 import fs from 'fs';
 import morgan from 'morgan';
 
-class Server {
+export default class Server {
   static createLogs(app) {
     const accessLogStream = fs.createWriteStream('./logs/access.log', {
       flags: 'a',
@@ -40,5 +40,3 @@ class Server {
     }
   }
 }
-
-export default Server;

@@ -2,7 +2,7 @@ import UserService from '../services/UserService';
 import LinksGenerator from '../helpers/LinksGenerator';
 
 const links = LinksGenerator.generateLinks('currentUser')
-class UserController {
+export default class UserController {
   static async register(req, res) {
     try {
       await UserService.register(req.body);
@@ -48,5 +48,3 @@ class UserController {
     }
   }
 }
-
-export default UserController;

@@ -3,7 +3,7 @@ import UserRepository from '../repositories/UserRepository';
 import DataValidator from '../helpers/DataValidator';
 import { NotFoundError, BadRequestError, InvalidDataError } from '../helpers/ErrorGenerator';
 
-class SessionService {
+export default class SessionService {
   static async getUserById(id) {
     const user = await UserRepository.getUser({ _id: id });
     if (!user) {
@@ -78,5 +78,3 @@ class SessionService {
     }
   }
 }
-
-export default SessionService;
