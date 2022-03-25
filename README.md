@@ -97,7 +97,7 @@ Coverage is found in /coverage folder.
 
 ## Logs
 
-
+Logs are generated with Morgan and can be found in the logs folder.
 
 ## Utilities
 
