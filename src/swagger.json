@@ -256,11 +256,11 @@
                 "properties": {
                   "email": {
                     "type": "string",
-                    "example": "test@test.com"
+                    "example": "user-test@test.com"
                   },
                   "password": {
                     "type": "string",
-                    "example": "test123456"
+                    "example": "usertest123"
                   }
                 }
               }
