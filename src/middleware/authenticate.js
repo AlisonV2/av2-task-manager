@@ -9,6 +9,10 @@ const authenticate = async (req, res, next) => {
     const decoded = SecurityService.verifyAccessToken(token);
     const user = await UserService.getUser({ id: decoded.id });
 
+    if (!user.token) {
+      throw new Error();
+    }
+
     req.user = user;
 
     next();

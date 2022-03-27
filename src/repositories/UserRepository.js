@@ -8,6 +8,7 @@ class UserRepository {
       name: user.name,
       email: user.email,
       role: user.role,
+      token: user.token
     };
   }
 
