@@ -4,7 +4,7 @@ Bordeaux Ynov M1 - Web Services (March 2022)
 
 ## About the application
 
-REST API created with Node and Express.
+REST API task manager application created with Node and Express.
 
 ### Functionnalities: 
 
@@ -18,8 +18,6 @@ REST API created with Node and Express.
 ### Stack
 
 <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" /> <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" /> <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white"/> <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" /> <img src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white" />
-
-## Application architecture
 
 ## Endpoints
 
@@ -64,14 +62,18 @@ One the application is running, it can be found on localhost:3000/api/docs.
 
 ## Workflow
 
-Each feat/* branch is linked to an US on Jira. Keeping the US in the branch name is important for Jira to update the story. 
+- Each feat/* branch is linked to an US on Jira. Keeping the US in the branch name is important for Jira to update the story. 
+- Test suites run when pushing on feat/* or fix/* branches.
+- SonarCloud Scanner runs on push to master branch and PR to others. 
 
 ## Setup
+
+Copy .env.example to .env and fill in the values.
 
 With docker: 
 
 ```sh
-docker-compose up
+docker-compose up --build
 ```
 
 Without docker:
@@ -97,7 +99,7 @@ Coverage is found in /coverage folder.
 
 ## Logs
 
-Logs are generated with Morgan and can be found in the logs folder.
+Logs are generated with [morgan](https://github.com/expressjs/morgan) and can be found in the logs folder.
 
 ## Utilities
 

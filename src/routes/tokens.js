@@ -8,7 +8,3 @@ router
   .get('/:token', TokenController.verifyEmail);
 
 export { router as tokensRouter };
-
-// /authentication : login (post), logout (get)
-// /users : register, delete, update, verify
-// /tokens : get (verify), post (refresh)

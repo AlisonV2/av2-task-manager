@@ -7,7 +7,7 @@ beforeEach(async () => clear());
 afterAll(async () => disconnect());
 
 describe('DataValidator', () => {
-  test('Token validation should fail', async () => {
+  test('Token validation should fail', () => {
     try {
       DataValidator.isUserAuthenticated();
     } catch (err) {
@@ -15,7 +15,7 @@ describe('DataValidator', () => {
       expect(err.statusCode).toBe(401);
     }
   });
-  test('Task validation should fail', async () => {
+  test('Task validation should fail', () => {
     try {
       DataValidator.validateTaskFields({ 
         title: 'Whatever',
@@ -27,7 +27,7 @@ describe('DataValidator', () => {
     }
   });
 
-  test('Update fields validation should fail', async () => {
+  test('Update fields validation should fail', () => {
     try {
       DataValidator.validateUpdateFields({ 
         title: 'Whatever',
@@ -40,7 +40,7 @@ describe('DataValidator', () => {
     }
   });
 
-  test('Completing task should fail', async () => {
+  test('Completing task should fail', () => {
     try {
       DataValidator.validateCompleteTask({ 
         status: 'completed'
@@ -51,7 +51,7 @@ describe('DataValidator', () => {
     }
   });
 
-  test('Filters validation should fail', async () => {
+  test('Filters validation should fail', () => {
     const user = {
       role: 'user'
     };
@@ -70,7 +70,7 @@ describe('DataValidator', () => {
     }
   });
 
-  test('Should throw an error if data is empty', async () => {
+  test('Should throw an error if data is empty', () => {
     try {
       DataValidator.isEmptyData([], 'tasks');
     } catch (err) {
@@ -78,7 +78,7 @@ describe('DataValidator', () => {
       expect(err.statusCode).toBe(404);
     }
   });
-  test('Email validation should fail', async () => {
+  test('Email validation should fail', () => {
     try {
       DataValidator.validateEmail('wrong-email');
     } catch (err) {
@@ -87,7 +87,7 @@ describe('DataValidator', () => {
     }
   });
 
-  test('User fields validation should fail', async () => {
+  test('User fields validation should fail', () => {
     try {
       DataValidator.validateUserFields({
         name: 'Whatever',
@@ -109,7 +109,7 @@ describe('DataValidator', () => {
     }
   });
 
-  test('Should not update password if field is missing', async () => {
+  test('Should not update password if field is missing', () => {
     try {
       DataValidator.validatePasswordFields({ password: '123456'});
     } catch (err) {
@@ -118,7 +118,7 @@ describe('DataValidator', () => {
     }
   });
 
-  test('Should not allow email to be updated', async () => {
+  test('Should not allow email to be updated', () => {
     try {
       DataValidator.validateUpdateFields({ password: '123456', email: 'test@test.com'}, 'user');
     } catch (err) {
@@ -127,7 +127,7 @@ describe('DataValidator', () => {
     }
   });
 
-  test('Should throw an error if role is user', async () => {
+  test('Should throw an error if role is user', () => {
     try {
       DataValidator.validateAdminRole('user');
     } catch (err) {
@@ -136,7 +136,7 @@ describe('DataValidator', () => {
     }
   });
 
-  test('Should throw an error if data is empty', async () => {
+  test('Should throw an error if data is empty', () => {
     try {
       DataValidator.isEmptyData([], 'users');
     } catch (err) {
@@ -144,4 +144,13 @@ describe('DataValidator', () => {
       expect(err.statusCode).toBe(404);
     }
   });
+
+  test('Should throw an error if token does not exist', () => {
+    try {
+      DataValidator.isUserLoggedIn();
+    } catch (err) {
+      expect(err.message).toBe('Not authenticated');
+      expect(err.statusCode).toBe(401);
+    }
+  })
 });

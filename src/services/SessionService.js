@@ -1,5 +1,6 @@
 import SecurityService from './SecurityService';
 import UserRepository from '../repositories/UserRepository';
+import QuoteService from './QuoteService';
 import DataValidator from '../helpers/DataValidator';
 import { NotFoundError, BadRequestError, InvalidDataError } from '../helpers/ErrorGenerator';
 
@@ -47,11 +48,16 @@ export default class SessionService {
       };
 
       const updatedUser = await UserRepository.updateUser(userData);
+      const { content, author } = await QuoteService.getRandomQuote();
 
       return {
         user: updatedUser.name,
         access: accessToken,
         refresh: refreshToken,
+        quote: {
+          content: content,
+          author: author,
+        }
       };
     } catch (err) {
       const error = new Error(err.message);
