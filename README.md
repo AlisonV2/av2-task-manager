@@ -14,6 +14,7 @@ REST API task manager application created with Node and Express.
 - Time logger
 - Admin access
 - Dockerized
+- [Quotable API](https://github.com/lukePeavey/quotable) integration 
 
 ### Stack
 
