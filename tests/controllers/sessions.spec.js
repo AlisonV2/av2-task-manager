@@ -7,6 +7,7 @@ import {
   deleteUser,
   createLoggedUser,
 } from '../fixtures/users';
+import SessionController from '../../src/controllers/SessionController';
 
 beforeAll(async () => connect());
 beforeEach(async () => clear());
@@ -25,6 +26,20 @@ describe('Session routes', () => {
 
     expect(response.body.user).toBe('User1');
     expect(response.body.access).toBeTruthy();
+    
+  });
+
+  test('Should return a quote when logging in', async () => {
+    const user = await createUser();
+    const response = await request(app)
+      .post('/api/sessions')
+      .send({
+        email: user.email,
+        password: 'test123456',
+      })
+      .expect(200);
+
+    expect(response.body.quote).toBeTruthy();   
   });
 
   test('Should return an error if user not found', async () => {
@@ -78,4 +93,13 @@ describe('Session routes', () => {
       .send()
       .expect(401);
   });
+
+  test('Controller should throw an error',async () =>  {
+    try {
+      await SessionController.logout({}, {});
+    } catch(err) {
+      expect(err.message).toBeTruthy();
+      expect(err.statusCode).toBe(undefined)
+    }
+  })
 });

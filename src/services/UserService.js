@@ -13,7 +13,7 @@ export default class UserService {
     const hashed = await SecurityService.hashPassword(user.password);
     const newUser = await UserRepository.createUser({
       name: user.name,
-      email: user.email,
+      email: user.email.toLowerCase(),
       password: hashed,
     });
 
@@ -21,10 +21,12 @@ export default class UserService {
   }
 
   static async register(user) {
-    DataValidator.validateEmail(user.email);
-    const newUser = await this.createUser(user);
-    const createdToken = await SecurityService.createToken(newUser);
-    return EmailService.sendMail(createdToken.token, newUser.email);
+      DataValidator.validateUserFields(user);
+      DataValidator.validateEmail(user.email);
+      const newUser = await this.createUser(user);
+      const createdToken = await SecurityService.createToken(newUser);
+      return EmailService.sendMail(createdToken.token, newUser.email);
+    
   }
 
   static async updatePassword(id, password, old_password) {

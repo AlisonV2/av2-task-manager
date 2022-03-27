@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '../fixtures/app';
 import { connect, disconnect, clear } from '../fixtures/database';
-import { createAccessToken } from '../fixtures/users';
+import { createLoggedUser } from '../fixtures/users';
 import { createUserTask, createManyUserTasks } from '../fixtures/tasks';
 
 beforeAll(async () => connect());
@@ -10,10 +10,10 @@ afterAll(async () => disconnect());
 
 describe('Task routes', () => {
   test('Should return newly created task', async () => {
-    const { token } = await createAccessToken();
+    const { accessToken } = await createLoggedUser();
     const response = await request(app)
       .post('/api/tasks')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         title: 'Test task',
         description: 'Test description',
@@ -24,10 +24,10 @@ describe('Task routes', () => {
   });
 
   test('Should return an error when data is invalid', async () => {
-    const { token } = await createAccessToken();
+    const { accessToken } = await createLoggedUser();
     const response = await request(app)
       .post('/api/tasks')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         description: 'Test description',
       })
@@ -37,31 +37,31 @@ describe('Task routes', () => {
   });
 
   test('Should get task by id', async () => {
-    const { user, token } = await createAccessToken();
-    const task = await createUserTask(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser();
+    const task = await createUserTask(updatedUser._id);
     const response = await request(app)
       .get(`/api/tasks/${task._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
     expect(response.body.title).toBe(task.title);
   });
 
   test('Should throw an error when task not found', async () => {
-    const { token } = await createAccessToken();
+    const { accessToken } = await createLoggedUser();
     const response = await request(app)
       .get('/api/tasks/1213')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(404);
       expect(response.body).toBe('Task not found');
   });
 
   test('Should update a task', async () => {
-    const { user, token } = await createAccessToken();
-    const task = await createUserTask(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser();
+    const task = await createUserTask(updatedUser._id);
 
     const response = await request(app)
       .put(`/api/tasks/${task._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         title: 'Updated task',
       })
@@ -71,12 +71,12 @@ describe('Task routes', () => {
   });
 
   test('Should throw an error when failing to update task', async () => {
-    const { user, token } = await createAccessToken();
-    await createUserTask(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser();
+    await createUserTask(updatedUser._id);
 
     const response = await request(app)
       .put('/api/tasks/121374')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         title: 'Updated task',
       })
@@ -86,34 +86,34 @@ describe('Task routes', () => {
   });
 
   test('Should delete a task', async () => {
-    const { user, token } = await createAccessToken();
-    const task = await createUserTask(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser();
+    const task = await createUserTask(updatedUser._id);
 
     await request(app)
       .delete(`/api/tasks/${task._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(204);
   });
 
   test('Should throw an error when deleting a task failed', async () => {
-    const { user, token } = await createAccessToken();
-    await createUserTask(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser();
+    await createUserTask(updatedUser._id);
 
     const response = await request(app)
       .delete('/api/tasks/1234')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(404);
 
       expect(response.body).toBe('Task not found');
   });
 
   test('Should get all tasks', async () => {
-    const { user, token } = await createAccessToken(); 
-    const tasks = await createManyUserTasks(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser(); 
+    const tasks = await createManyUserTasks(updatedUser._id);
 
     const response = await request(app)
       .get('/api/tasks')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
 
     expect(response.body.tasks.length).toBe(tasks.length);
@@ -121,24 +121,24 @@ describe('Task routes', () => {
   });
 
   test('Should get all completed tasks', async () => {
-    const { user, token } = await createAccessToken(); 
-    await createManyUserTasks(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser(); 
+    await createManyUserTasks(updatedUser._id);
 
     const response = await request(app)
       .get('/api/tasks?status=completed')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
 
     expect(response.body.tasks.length).toBe(2);
   })
 
   test('Should get all pending tasks by ASC order', async () => {
-    const { user, token } = await createAccessToken(); 
-    await createManyUserTasks(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser(); 
+    await createManyUserTasks(updatedUser._id);
 
     const response = await request(app)
       .get('/api/tasks?status=pending&sort=title:asc')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
 
     expect(response.body.tasks.length).toBe(2);
@@ -146,12 +146,12 @@ describe('Task routes', () => {
   })
 
   test('Should get all pending tasks by DESC order', async () => {
-    const { user, token } = await createAccessToken(); 
-    await createManyUserTasks(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser(); 
+    await createManyUserTasks(updatedUser._id);
 
     const response = await request(app)
       .get('/api/tasks?status=pending&sort=title:desc')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
 
     expect(response.body.tasks.length).toBe(2);
@@ -159,12 +159,12 @@ describe('Task routes', () => {
   })
 
   test('Should return the first 3 tasks', async () => {
-    const { user, token } = await createAccessToken(); 
-    await createManyUserTasks(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser(); 
+    await createManyUserTasks(updatedUser._id);
 
     const response = await request(app)
       .get('/api/tasks?limit=3')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
 
     expect(response.body.tasks.length).toBe(3);
@@ -172,12 +172,12 @@ describe('Task routes', () => {
   })
 
   test('Should return the next 3 tasks', async () => {
-    const { user, token } = await createAccessToken(); 
-    await createManyUserTasks(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser(); 
+    await createManyUserTasks(updatedUser._id);
 
     const response = await request(app)
       .get('/api/tasks?page=2&limit=3')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
 
     expect(response.body.tasks.length).toBe(3);
@@ -185,12 +185,12 @@ describe('Task routes', () => {
   })
 
   test('Should throw an error when no tasks found', async () => {
-    const { user, token } = await createAccessToken(); 
-    await createUserTask(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser(); 
+    await createUserTask(updatedUser._id);
 
     const response = await request(app)
       .get('/api/tasks?status=completed')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(404);
 
     expect(response.body).toBe('No tasks found');

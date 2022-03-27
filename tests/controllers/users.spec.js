@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '../fixtures/app';
 import { connect, disconnect, clear } from '../fixtures/database';
-import { createUser, createAccessToken, deleteUser, createAdminToken } from '../fixtures/users';
+import { createUser, deleteUser, createLoggedUser, createLoggedAdmin } from '../fixtures/users';
 import nodemailer from 'nodemailer';
 import UserController from '../../src/controllers/UserController';
 
@@ -48,11 +48,11 @@ describe('Users routes', () => {
   });
 
   test('Should update an existing user', async () => {
-    const { token } = await createAccessToken();
+    const { accessToken } = await createLoggedUser();
 
     const response = await request(app)
       .put('/api/users/current')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         name: 'UpdatedUser',
       })
@@ -62,11 +62,11 @@ describe('Users routes', () => {
   });
 
   test('Should throw an error when fields are invalid', async () => {
-    const { token } = await createAccessToken();
+    const { accessToken } = await createLoggedUser();
 
     const response = await request(app)
       .put('/api/users/current')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         id: 'user123456',
       })
@@ -76,30 +76,30 @@ describe('Users routes', () => {
   });
 
   test('Should delete a user', async () => {
-    const { token } = await createAccessToken();
+    const { accessToken } = await createLoggedUser();
     await request(app)
       .delete('/api/users/current')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(204);
   });
 
   test('Should get a specific user', async () => {
-    const { user, token } = await createAccessToken();
+    const { updatedUser, accessToken } = await createLoggedUser();
     const response = await request(app)
       .get('/api/users/current')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send()
       .expect(200);
 
-    expect(response.body.name).toBe(user.name);
+    expect(response.body.name).toBe(updatedUser.name);
   });
 
   test('Should throw an error in middleware if the user does not exist', async () => {
-    const { user, token } = await createAccessToken();
-    await deleteUser(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser();
+    await deleteUser(updatedUser._id);
     const response = await request(app)
       .get('/api/users/current')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send()
       .expect(401);
 
@@ -107,11 +107,11 @@ describe('Users routes', () => {
   });
 
   test('Should throw an error if deleting user fails', async () => {
-    const { user, token } = await createAccessToken();
-    await deleteUser(user._id);
+    const { updatedUser, accessToken } = await createLoggedUser();
+    await deleteUser(updatedUser._id);
     const response = await request(app)
       .delete('/api/users/current')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(401);
 
     expect(response.body).toBe('Not authorized');
@@ -141,10 +141,10 @@ describe('Users routes', () => {
   });
 
   test('Should get users if admin', async () => {
-    const { token } = await createAdminToken();
+    const { accessToken } = await createLoggedAdmin();
     const response = await request(app)
       .get('/api/users')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send()
       .expect(200);
 
@@ -152,10 +152,10 @@ describe('Users routes', () => {
   })
 
   test('Should throw an error if not admin', async () => {
-    const { token } = await createAccessToken();
+    const { accessToken } = await createLoggedUser();
     await request(app)
       .get('/api/users')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send()
       .expect(403);
   })

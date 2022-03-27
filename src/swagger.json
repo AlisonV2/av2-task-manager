@@ -74,7 +74,6 @@
         "responses": {
           "201": {
             "description": "User created",
-            "content": {},
             "links": {
               "currentUser": {
                 "$ref": "#/components/links/currentUser"
@@ -272,7 +271,40 @@
         "responses": {
           "200": {
             "description": "User login",
-            "content": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "type": "string",
+                      "description": "Name of the user"
+                    },
+                    "access": {
+                      "type": "string",
+                      "description": "Access token"
+                    },
+                    "refresh": {
+                      "type": "string",
+                      "description": "Refresh token"
+                    },
+                    "quote": {
+                      "type": "object",
+                      "properties": {
+                        "content": {
+                          "type": "string",
+                          "description": "Quote content"
+                        },
+                        "author": {
+                          "type": "string",
+                          "description": "Quote author"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "links": {
               "login": {
                 "$ref": "#/components/links/login"
@@ -335,7 +367,6 @@
         "responses": {
           "200": {
             "description": "Successful operation",
-            "content": {},
             "links": {
               "refreshToken": {
                 "$ref": "#/components/links/refreshToken"
@@ -504,7 +535,22 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Task"
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["pending", "in-progress", "completed"]
+                  },
+                  "time": {
+                    "type": "integer"
+                  }
+                }
               }
             }
           },
@@ -627,6 +673,10 @@
                   "time": {
                     "type": "integer",
                     "format": "int32"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["pending", "in-progress", "completed"]
                   }
                 }
               }
@@ -689,7 +739,6 @@
         "responses": {
           "204": {
             "description": "Task deleted successfully",
-            "content": {},
             "links": {
               "getAllTasks": {
                 "$ref": "#/components/links/getAllTasks"
@@ -779,21 +828,10 @@
           "email": {
             "type": "string"
           },
-          "password": {
-            "type": "string"
-          },
           "role": {
             "type": "string",
             "enum": ["admin", "user"],
             "default": "user"
-          },
-          "token": {
-            "type": "string",
-            "default": null
-          },
-          "verified": {
-            "type": "boolean",
-            "default": false
           }
         }
       },
@@ -829,16 +867,8 @@
         }
       },
       "Error": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
+        "type": "string",
+        "example": "Error during request"
       }
     },
     "links": {

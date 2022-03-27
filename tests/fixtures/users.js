@@ -97,6 +97,24 @@ const createLoggedUser = async () => {
   return { updatedUser, accessToken };
 };
 
+const createLoggedAdmin = async () => {
+  const user = await createAdmin();
+  const accessToken = SecurityService.generateAccessToken({
+    ...user,
+    id: user._id.toString(),
+  });
+
+  const refreshToken = SecurityService.generateRefreshToken({
+    ...user,
+    id: user._id.toString(),
+  })
+
+  user.token = refreshToken;
+  const updatedUser = await user.save();
+
+  return { updatedUser, accessToken };
+};
+
 export {
   createUser,
   createAccessToken,
@@ -106,4 +124,5 @@ export {
   createAdmin,
   createAdminToken,
   createLoggedUser,
+  createLoggedAdmin
 };
