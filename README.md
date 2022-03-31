@@ -59,7 +59,7 @@ Authentication is provided through HTTP Header Authorization, in the following f
 The documentation is made in OpenAPI 3.0 format.
 It is generated from swagger.json file and loaded through [swagger-ui-express](https://github.com/scottie1984/swagger-ui-express).
 
-One the application is running, it can be found on localhost:3000/api/docs.
+Once the application is running, it can be found on localhost:3000/api/docs.
 
 ## Workflow
 
