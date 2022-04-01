@@ -13,7 +13,7 @@ router
     .post('/', authenticate, TaskController.createTask)
     .get('/', authenticate, TaskController.getTasks)
     .get('/:id', authenticate, TaskController.getTaskById)
-    .put('/:id', authenticate, TaskController.updateTask)
+    .patch('/:id', authenticate, TaskController.updateTask)
     .delete('/:id', authenticate, TaskController.deleteTask);
 
 export { router as tasksRouter };
